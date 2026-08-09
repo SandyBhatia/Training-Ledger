@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { createClient } from "@/lib/supabase/server";
 import { screenProfile } from "@/lib/guardrails";
+import { checkPlanLimit } from "@/lib/limits";
 import { WORKOUT_SYSTEM, planUserMessage } from "@/lib/prompts";
 import type { Profile } from "@/lib/types";
 
@@ -12,6 +13,9 @@ export async function POST(req: Request) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+
+  const limit = await checkPlanLimit(user.id);
+  if (!limit.ok) return NextResponse.json({ error: "limit_reached", detail: limit.message }, { status: 429 });
 
   const body = (await req.json()) as Profile & { start_date?: string };
   const startDate = body.start_date || new Date().toISOString().slice(0, 10);

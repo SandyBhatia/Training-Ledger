@@ -56,10 +56,10 @@ export default function DashboardView({ profile, plan, logs, checkins }: {
       </div>
 
       {phase && (
-        <div className="card" style={{ borderLeft: "3px solid var(--gold)", marginBottom: 14 }}>
+        <div className="card" style={{ borderLeft: "3px solid var(--accent)", marginBottom: 14 }}>
           <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 6 }}>
             <span className="eyebrow">Week {curWeek + 1} · {phase.name}</span>
-            <span className="mono" style={{ fontSize: 11.5, color: phase.deload ? "var(--blue)" : "var(--gold)" }}>{phase.rpe}</span>
+            <span className="mono" style={{ fontSize: 11.5, color: phase.deload ? "var(--blue)" : "var(--accent)" }}>{phase.rpe}</span>
           </div>
           <div style={{ fontSize: 14, lineHeight: 1.55, color: "#c9cfe0" }}>{phase.note}</div>
         </div>
@@ -72,7 +72,7 @@ export default function DashboardView({ profile, plan, logs, checkins }: {
             <span className="mono" style={{ fontSize: 12, color: "var(--muted)" }}>{doneToDate}/{scheduled} · {adherence}%</span>
           </div>
           <div style={{ height: 8, background: "#141a2b", border: "1px solid var(--line)", borderRadius: 99, overflow: "hidden" }}>
-            <div style={{ height: "100%", width: `${adherence}%`, background: "linear-gradient(90deg,var(--gold),#e6c24d)" }} />
+            <div style={{ height: "100%", width: `${adherence}%`, background: "linear-gradient(90deg,var(--fill),var(--accent))" }} />
           </div>
         </div>
       )}
@@ -105,13 +105,13 @@ export default function DashboardView({ profile, plan, logs, checkins }: {
                   border: "1px solid var(--line)", background: "#141a2b", color: "#5f6889",
                 };
                 if (!r.isWorkout) Object.assign(base, { borderStyle: "dashed", background: "transparent", opacity: 0.5 });
-                if (done) Object.assign(base, { background: "var(--gold)", borderColor: "var(--gold)", color: "#191300" });
-                if (isToday) Object.assign(base, { boxShadow: "inset 0 0 0 1px var(--gold)", borderColor: "var(--gold)" });
+                if (done) Object.assign(base, { background: "var(--fill)", borderColor: "var(--fill)", color: "var(--ink-on-accent)" });
+                if (isToday) Object.assign(base, { boxShadow: "inset 0 0 0 1px var(--accent)", borderColor: "var(--accent)" });
                 if (!done && !isToday && r.i < tIdx && r.isWorkout) base.opacity = 0.4;
                 const title = r.isWorkout ? split[r.splitIndex!]?.title || "Session" : "Rest";
                 return <div key={r.key} title={`${title} · ${fmtDate(r.date)}`} style={base}>{r.isWorkout ? title[0] : "·"}</div>;
               })}
-              <span className="mono" style={{ fontSize: 9.5, textAlign: "right", color: wDone >= wTotal && wTotal > 0 ? "var(--gold)" : "var(--muted)" }}>{wDone}/{wTotal}</span>
+              <span className="mono" style={{ fontSize: 9.5, textAlign: "right", color: wDone >= wTotal && wTotal > 0 ? "var(--accent)" : "var(--muted)" }}>{wDone}/{wTotal}</span>
             </div>
           );
         })}

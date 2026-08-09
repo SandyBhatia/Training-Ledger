@@ -105,7 +105,7 @@ export default function SettingsView({ profile, plan, logCount }: { profile: any
             </div>
             <label style={{ display: "flex", gap: 9, alignItems: "flex-start", cursor: "pointer", marginBottom: 12 }}>
               <input type="checkbox" checked={clearLogs} onChange={(e) => { setClearLogs(e.target.checked); setConfirmed(false); }}
-                style={{ marginTop: 3, accentColor: "var(--gold)" }} />
+                style={{ marginTop: 3, accentColor: "var(--accent)" }} />
               <span style={{ fontSize: 13.5 }}>
                 Clear my logged progress
                 <span className="muted" style={{ display: "block", fontSize: 11.5, marginTop: 2 }}>
@@ -118,7 +118,7 @@ export default function SettingsView({ profile, plan, logCount }: { profile: any
 
             {clearLogs && logCount > 0 && !confirmed ? (
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
-                <span style={{ fontSize: 13, color: "#e6b877" }}>Delete {logCount} logged days permanently?</span>
+                <span style={{ fontSize: 13, color: "var(--warn)" }}>Delete {logCount} logged days permanently?</span>
                 <button className="btn ghost" style={{ color: "#e0a3a3", borderColor: "#7a3a4d" }} onClick={() => setConfirmed(true)}>Yes, I&apos;m sure</button>
                 <button className="btn ghost" onClick={() => setRestarting(false)}>Cancel</button>
               </div>

@@ -1,11 +1,24 @@
 import "./globals.css";
 import type { Metadata, Viewport } from "next";
+import PWA from "@/components/PWA";
 
 export const metadata: Metadata = {
   title: "Training Ledger",
   description: "A personal, condition-aware training and nutrition companion.",
+  manifest: "/manifest.json",
+  appleWebApp: { capable: true, statusBarStyle: "black-translucent", title: "Ledger" },
+  icons: {
+    icon: [{ url: "/icons/favicon-32.png", sizes: "32x32" }, { url: "/icons/icon-192.png", sizes: "192x192" }],
+    apple: "/icons/apple-touch-icon.png",
+  },
 };
-export const viewport: Viewport = { width: "device-width", initialScale: 1 };
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  viewportFit: "cover",
+  themeColor: "#101113",
+};
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -16,7 +29,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           rel="stylesheet"
         />
       </head>
-      <body>{children}</body>
+      <body>{children}<PWA /></body>
     </html>
   );
 }

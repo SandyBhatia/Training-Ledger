@@ -3,6 +3,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { createClient } from "@/lib/supabase/server";
 import { NUTRITION_SYSTEM, planUserMessage } from "@/lib/prompts";
 import type { Profile } from "@/lib/types";
+import { checkPlanLimit } from "@/lib/limits";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -13,6 +14,9 @@ export async function POST(req: Request) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+
+  const limit = await checkPlanLimit(user.id, 1); // the plan row for this generation already counted
+  if (!limit.ok) return NextResponse.json({ error: "limit_reached", detail: limit.message }, { status: 429 });
 
   const { plan_id } = (await req.json()) as { plan_id?: string };
 

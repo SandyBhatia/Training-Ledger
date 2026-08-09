@@ -127,7 +127,7 @@ export default function TodayView({ profile, plan, logs }: { profile: any; plan:
         <div style={{ textAlign: "center" }}>
           <div style={{ fontFamily: "Fraunces, serif", fontSize: 18 }}>
             {info.date.toLocaleDateString("en-US", { weekday: "short" })} · {fmtDate(info.date)}
-            {sel === tIdx && <span style={{ marginLeft: 8, fontSize: 10, background: "var(--gold)", color: "#191300", padding: "2px 7px", borderRadius: 99, fontWeight: 600 }}>today</span>}
+            {sel === tIdx && <span style={{ marginLeft: 8, fontSize: 10, background: "var(--accent)", color: "var(--ink-on-accent)", padding: "2px 7px", borderRadius: 99, fontWeight: 600 }}>today</span>}
           </div>
           <div className="mono" style={{ fontSize: 11, color: "var(--muted)", marginTop: 3 }}>
             Day {sel + 1} of {totalDays}{info.isWorkout ? ` · session ${info.seq! + 1} · week ${info.week + 1}` : ""}
@@ -164,22 +164,22 @@ export default function TodayView({ profile, plan, logs }: { profile: any; plan:
           </p>
         </div>
       ) : (
-        <div style={{ background: "var(--paper)", color: "var(--ink)", borderRadius: 12, padding: 18, borderTop: "4px solid var(--gold)" }}>
+        <div style={{ background: "var(--paper)", color: "var(--ink)", borderRadius: 12, padding: 18, borderTop: "4px solid var(--accent)" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12, marginBottom: 12 }}>
             <div>
               <div style={{ fontFamily: "Fraunces, serif", fontSize: 22, fontWeight: 600 }}>{tpl?.title}</div>
-              <div style={{ fontSize: 12.5, color: "#6f6247" }}>{tpl?.focus}</div>
+              <div style={{ fontSize: 12.5, color: "#5f6650" }}>{tpl?.focus}</div>
             </div>
             <button onClick={() => save({ done: !day.done })}
-              style={{ background: day.done ? "var(--green)" : "transparent", color: day.done ? "#06170e" : "var(--gold)",
-                border: `1.5px solid ${day.done ? "var(--green)" : "var(--gold)"}`, borderRadius: 7, padding: "9px 15px",
+              style={{ background: day.done ? "var(--green)" : "transparent", color: day.done ? "#06170e" : "var(--accent)",
+                border: `1.5px solid ${day.done ? "var(--green)" : "var(--accent)"}`, borderRadius: 7, padding: "9px 15px",
                 fontWeight: 600, fontSize: 12.5, cursor: "pointer", whiteSpace: "nowrap" }}>
               {day.done ? "✓ Logged" : "Mark done"}
             </button>
           </div>
 
           {phase && (
-            <div style={{ background: "#e9dfc4", border: "1px solid #ddd0ab", borderRadius: 8, padding: "9px 12px", fontSize: 12.5, lineHeight: 1.5, marginBottom: 14 }}>
+            <div style={{ background: "#e8e9dd", border: "1px solid #d3d6c4", borderRadius: 8, padding: "9px 12px", fontSize: 12.5, lineHeight: 1.5, marginBottom: 14 }}>
               <strong>{phase.name} · {phase.rpe}.</strong> {phase.note}
             </div>
           )}
@@ -190,7 +190,7 @@ export default function TodayView({ profile, plan, logs }: { profile: any; plan:
                 <strong>{timer.exName}</strong>
               </div>
               <div className="mono" style={{ fontSize: 44, fontWeight: 600, textAlign: "center",
-                color: timer.phase === "rest" ? "var(--blue)" : timer.phase === "done" ? "var(--green)" : "var(--gold)" }}>
+                color: timer.phase === "rest" ? "var(--blue)" : timer.phase === "done" ? "var(--green)" : "var(--accent)" }}>
                 {timer.phase === "rest" ? mmss(restLeft) : timer.phase === "done" ? "✓" : mmss(elapsed)}
               </div>
               <div style={{ textAlign: "center", fontSize: 10.5, letterSpacing: ".1em", textTransform: "uppercase", color: "var(--muted)", marginBottom: 12 }}>
@@ -207,15 +207,15 @@ export default function TodayView({ profile, plan, logs }: { profile: any; plan:
             </div>
           )}
 
-          {tpl?.warmup && <div style={{ fontSize: 12.5, color: "#4a4026", marginBottom: 12 }}><strong style={{ fontSize: 10, letterSpacing: ".1em", textTransform: "uppercase", color: "#8a7a4e" }}>Warm-up </strong>{tpl.warmup}</div>}
+          {tpl?.warmup && <div style={{ fontSize: 12.5, color: "#3f4634", marginBottom: 12 }}><strong style={{ fontSize: 10, letterSpacing: ".1em", textTransform: "uppercase", color: "#6f7a4a" }}>Warm-up </strong>{tpl.warmup}</div>}
 
           {ex && (
             <>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-                <span style={{ fontSize: 10.5, letterSpacing: ".1em", textTransform: "uppercase", color: "#8a7a4e", fontWeight: 700 }}>
+                <span style={{ fontSize: 10.5, letterSpacing: ".1em", textTransform: "uppercase", color: "#6f7a4a", fontWeight: 700 }}>
                   Exercise {cardIdx + 1} of {exercises.length}
                 </span>
-                <span className="mono" style={{ fontSize: 11, color: "#8a7c58" }}>
+                <span className="mono" style={{ fontSize: 11, color: "#77805a" }}>
                   {exercises.filter((e: any) => day.payload?.ex?.[e.name]).length}/{exercises.length} done
                 </span>
               </div>
@@ -223,7 +223,7 @@ export default function TodayView({ profile, plan, logs }: { profile: any; plan:
                 {exercises.map((e: any, i: number) => (
                   <button key={i} onClick={() => setCard(i)} aria-label={`Exercise ${i + 1}`}
                     style={{ width: 8, height: 8, padding: 0, borderRadius: "50%", cursor: "pointer",
-                      border: "1px solid #cdbf98", background: i === cardIdx ? "var(--gold)" : day.payload?.ex?.[e.name] ? "#8a7a4e" : "transparent" }} />
+                      border: "1px solid #cdbf98", background: i === cardIdx ? "var(--accent)" : day.payload?.ex?.[e.name] ? "#8a7a4e" : "transparent" }} />
                 ))}
               </div>
 
@@ -236,23 +236,23 @@ export default function TodayView({ profile, plan, logs }: { profile: any; plan:
                 onMouseUp={onUp} onMouseLeave={onUp}
                 style={{ touchAction: "pan-y", userSelect: "none", cursor: "grab" }}
               >
-                <div style={{ background: day.payload?.ex?.[ex.name] ? "#e6dcc0" : "#efe7d2",
-                  border: `1px solid ${day.payload?.ex?.[ex.name] ? "var(--gold)" : "#e3d9bd"}`,
+                <div style={{ background: day.payload?.ex?.[ex.name] ? "#e4e7d2" : "#eef0e4",
+                  border: `1px solid ${day.payload?.ex?.[ex.name] ? "var(--fill)" : "#dcdfcd"}`,
                   borderRadius: 12, padding: 18, transform: `translateX(${drag}px)`, transition: "transform .15s ease" }}>
                   <div style={{ fontFamily: "Fraunces, serif", fontSize: 20, fontWeight: 600 }}>{ex.name}</div>
-                  {ex.alt && <div style={{ fontSize: 12, color: "#8a7c58", marginTop: 3 }}>Travel: {ex.alt}</div>}
+                  {ex.alt && <div style={{ fontSize: 12, color: "#77805a", marginTop: 3 }}>Travel: {ex.alt}</div>}
                   <div style={{ display: "flex", gap: 22, margin: "14px 0 6px" }}>
-                    <div><div className="mono" style={{ fontSize: 17, fontWeight: 600 }}>{ex.sets_reps}</div><div style={{ fontSize: 10, letterSpacing: ".08em", textTransform: "uppercase", color: "#8a7a4e" }}>sets × reps</div></div>
-                    <div><div className="mono" style={{ fontSize: 17, fontWeight: 600 }}>{ex.rest}</div><div style={{ fontSize: 10, letterSpacing: ".08em", textTransform: "uppercase", color: "#8a7a4e" }}>rest</div></div>
+                    <div><div className="mono" style={{ fontSize: 17, fontWeight: 600 }}>{ex.sets_reps}</div><div style={{ fontSize: 10, letterSpacing: ".08em", textTransform: "uppercase", color: "#6f7a4a" }}>sets × reps</div></div>
+                    <div><div className="mono" style={{ fontSize: 17, fontWeight: 600 }}>{ex.rest}</div><div style={{ fontSize: 10, letterSpacing: ".08em", textTransform: "uppercase", color: "#6f7a4a" }}>rest</div></div>
                   </div>
-                  {ex.note && <div style={{ fontSize: 12, fontStyle: "italic", color: "#6f6247", marginTop: 6 }}>{ex.note}</div>}
+                  {ex.note && <div style={{ fontSize: 12, fontStyle: "italic", color: "#5f6650", marginTop: 6 }}>{ex.note}</div>}
                   <div style={{ display: "flex", alignItems: "center", gap: 8, margin: "14px 0 6px" }}>
-                    <span style={{ fontSize: 10.5, letterSpacing: ".08em", textTransform: "uppercase", color: "#8a7a4e", fontWeight: 700 }}>Weight</span>
+                    <span style={{ fontSize: 10.5, letterSpacing: ".08em", textTransform: "uppercase", color: "#6f7a4a", fontWeight: 700 }}>Weight</span>
                     <input inputMode="decimal" placeholder="—" value={day.payload?.w?.[ex.name] ?? ""}
                       onChange={(e) => setWeight(ex.name, e.target.value)}
-                      style={{ width: 66, background: "#fbf7ec", border: "1px solid #d8cdaf", borderRadius: 6, padding: "7px 8px",
+                      style={{ width: 66, background: "#f7f8f0", border: "1px solid #cfd3c0", borderRadius: 6, padding: "7px 8px",
                         fontFamily: "IBM Plex Mono, monospace", fontSize: 13, color: "var(--ink)", textAlign: "right" }} />
-                    <span className="mono" style={{ fontSize: 11, color: "#8a7c58" }}>{profile?.units || "lbs"}</span>
+                    <span className="mono" style={{ fontSize: 11, color: "#77805a" }}>{profile?.units || "lbs"}</span>
                   </div>
                   <div style={{ display: "flex", gap: 8, marginTop: 14, flexWrap: "wrap" }}>
                     <button onClick={() => startEx(ex)} style={{ background: "#241c0d", color: "var(--paper)", border: "none", borderRadius: 6, padding: "8px 13px", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>▶ start</button>
@@ -265,26 +265,26 @@ export default function TodayView({ profile, plan, logs }: { profile: any; plan:
                     </button>
                   </div>
                   <a href={demoUrl(ex.name)} target="_blank" rel="noopener noreferrer"
-                    style={{ display: "inline-block", marginTop: 12, fontSize: 11.5, fontWeight: 600, color: "#9a7b12", textDecoration: "none" }}>▶ watch demo</a>
+                    style={{ display: "inline-block", marginTop: 12, fontSize: 11.5, fontWeight: 600, color: "#6b7a12", textDecoration: "none" }}>▶ watch demo</a>
                 </div>
               </div>
 
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 12 }}>
                 <button className="btn ghost" onClick={() => setCard(Math.max(0, cardIdx - 1))} disabled={cardIdx === 0} style={{ padding: "7px 14px" }}>‹</button>
-                <span className="mono" style={{ fontSize: 11, color: "#8a7c58" }}>swipe or use ‹ ›</span>
+                <span className="mono" style={{ fontSize: 11, color: "#77805a" }}>swipe or use ‹ ›</span>
                 <button className="btn ghost" onClick={() => setCard(Math.min(exercises.length - 1, cardIdx + 1))} disabled={cardIdx >= exercises.length - 1} style={{ padding: "7px 14px" }}>›</button>
               </div>
             </>
           )}
 
-          {tpl?.finisher && <div style={{ fontSize: 12.5, color: "#4a4026", marginTop: 14 }}><strong style={{ fontSize: 10, letterSpacing: ".1em", textTransform: "uppercase", color: "#8a7a4e" }}>Finisher </strong>{tpl.finisher}</div>}
-          {tpl?.cooldown && <div style={{ fontSize: 12.5, color: "#4a4026", marginTop: 10 }}><strong style={{ fontSize: 10, letterSpacing: ".1em", textTransform: "uppercase", color: "#8a7a4e" }}>Cool-down </strong>{tpl.cooldown}</div>}
+          {tpl?.finisher && <div style={{ fontSize: 12.5, color: "#3f4634", marginTop: 14 }}><strong style={{ fontSize: 10, letterSpacing: ".1em", textTransform: "uppercase", color: "#6f7a4a" }}>Finisher </strong>{tpl.finisher}</div>}
+          {tpl?.cooldown && <div style={{ fontSize: 12.5, color: "#3f4634", marginTop: 10 }}><strong style={{ fontSize: 10, letterSpacing: ".1em", textTransform: "uppercase", color: "#6f7a4a" }}>Cool-down </strong>{tpl.cooldown}</div>}
 
           <div style={{ marginTop: 16 }}>
-            <span style={{ fontSize: 10, letterSpacing: ".1em", textTransform: "uppercase", color: "#8a7a4e", fontWeight: 700 }}>Session notes</span>
+            <span style={{ fontSize: 10, letterSpacing: ".1em", textTransform: "uppercase", color: "#6f7a4a", fontWeight: 700 }}>Session notes</span>
             <textarea rows={3} value={day.payload?.notes ?? ""} onChange={(e) => setNotes(e.target.value)}
               placeholder="RPE, how it felt, anything to beat next time…"
-              style={{ width: "100%", marginTop: 6, background: "#fbf7ec", border: "1px solid #d8cdaf", borderRadius: 7,
+              style={{ width: "100%", marginTop: 6, background: "#f7f8f0", border: "1px solid #cfd3c0", borderRadius: 7,
                 padding: "10px 12px", fontFamily: "IBM Plex Mono, monospace", fontSize: 13, color: "var(--ink)", resize: "vertical" }} />
           </div>
         </div>

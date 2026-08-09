@@ -3,6 +3,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { createClient } from "@/lib/supabase/server";
 import { MACRO_SYSTEM } from "@/lib/prompts";
 import { lookupLocal } from "@/lib/food";
+import { checkMacroLimit } from "@/lib/limits";
 
 export const runtime = "nodejs";
 
@@ -17,6 +18,10 @@ export async function POST(req: Request) {
   // Local database first: instant, consistent, offline.
   const local = lookupLocal(description);
   if (local) return NextResponse.json(local);
+
+  // Only AI lookups are metered — database hits above are free and unlimited.
+  const limit = await checkMacroLimit(user.id);
+  if (!limit.ok) return NextResponse.json({ error: "limit_reached", detail: limit.message }, { status: 429 });
 
   if (!process.env.ANTHROPIC_API_KEY) {
     return NextResponse.json({ error: "missing_api_key" }, { status: 500 });

@@ -51,7 +51,9 @@ export default function Onboarding() {
       }
       if (data.deferred) { setDeferred(data.reason); setBusy(false); setStep(""); return; }
       if (data.error) {
-        setErr(data.detail ? `${data.error}: ${data.detail}` : "Something went wrong building the programme.");
+        setErr(data.error === "limit_reached"
+          ? data.detail
+          : (data.detail ? `${data.error}: ${data.detail}` : "Something went wrong building the programme."));
         setBusy(false); setStep(""); return;
       }
 

@@ -55,7 +55,7 @@ export default function CheckinView({ profile, checkins }: { profile: any; check
         ))}
       </div>
 
-      <div className="card" style={{ borderTop: "3px solid var(--gold)" }}>
+      <div className="card" style={{ borderTop: "3px solid var(--accent)" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 14 }}>
           <strong style={{ fontFamily: "Fraunces, serif", fontSize: 19 }}>{wk === 0 ? "Baseline" : `Week ${wk}`}</strong>
           {saving && <span className="muted" style={{ fontSize: 11.5 }}><span className="spinner" /> saving</span>}

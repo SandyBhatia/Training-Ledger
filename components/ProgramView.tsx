@@ -35,9 +35,9 @@ export default function ProgramView({ profile, plan, logs }: { profile: any; pla
                 <span className="mono" style={{ fontSize: 11.5, color: "var(--muted)" }}>{fmtDate(days[0].date)} – {fmtDate(days[6].date)}</span>
               </span>
               <span style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                {phase && <span className="mono" style={{ fontSize: 11, color: phase.deload ? "var(--blue)" : "var(--gold)",
+                {phase && <span className="mono" style={{ fontSize: 11, color: phase.deload ? "var(--blue)" : "var(--accent)",
                   border: `1px solid ${phase.deload ? "#7fb0d855" : "#c9a22755"}`, borderRadius: 5, padding: "3px 8px" }}>{phase.name}</span>}
-                <span className="mono" style={{ fontSize: 12, color: done >= total && total > 0 ? "var(--gold)" : "var(--muted)" }}>{done}/{total}</span>
+                <span className="mono" style={{ fontSize: 12, color: done >= total && total > 0 ? "var(--accent)" : "var(--muted)" }}>{done}/{total}</span>
               </span>
             </button>
             {open[w] && (
@@ -46,16 +46,16 @@ export default function ProgramView({ profile, plan, logs }: { profile: any; pla
                   const tpl = d.isWorkout ? split[d.splitIndex!] : null;
                   return (
                     <div key={d.key} style={{ background: d.isWorkout ? "var(--panel2)" : "transparent",
-                      border: `1px ${d.isWorkout ? "solid" : "dashed"} ${doneBy[d.key] ? "var(--gold)" : "var(--line)"}`,
+                      border: `1px ${d.isWorkout ? "solid" : "dashed"} ${doneBy[d.key] ? "var(--accent)" : "var(--line)"}`,
                       borderRadius: 8, padding: "10px 12px", opacity: d.isWorkout ? 1 : 0.6,
-                      boxShadow: d.i === tIdx ? "inset 0 0 0 1px var(--gold)" : undefined }}>
+                      boxShadow: d.i === tIdx ? "inset 0 0 0 1px var(--accent)" : undefined }}>
                       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5 }}>
                         <span style={{ fontSize: 11, fontWeight: 600, color: "var(--muted)" }}>{d.date.toLocaleDateString("en-US", { weekday: "short" })}</span>
                         <span className="mono" style={{ fontSize: 10, color: "#5f6889" }}>{fmtDate(d.date)}</span>
                       </div>
                       <div style={{ fontSize: 13, fontWeight: 600 }}>{tpl?.title || "Rest"}</div>
                       {tpl?.focus && <div style={{ fontSize: 11, color: "var(--muted)", marginTop: 2 }}>{tpl.focus}</div>}
-                      {doneBy[d.key] && <div style={{ color: "var(--gold)", fontSize: 12, marginTop: 4 }}>✓</div>}
+                      {doneBy[d.key] && <div style={{ color: "var(--accent)", fontSize: 12, marginTop: 4 }}>✓</div>}
                     </div>
                   );
                 })}

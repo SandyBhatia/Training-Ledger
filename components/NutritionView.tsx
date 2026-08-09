@@ -39,6 +39,7 @@ export default function NutritionView({ plan, initialFood, initialDate }: { plan
   });
   const [busy, setBusy] = useState(false);
   const [openFlag, setOpenFlag] = useState<string | null>(null);
+  const [limitMsg, setLimitMsg] = useState("");
 
   const loadDate = async (d: string) => {
     setDate(d);
@@ -57,7 +58,8 @@ export default function NutritionView({ plan, initialFood, initialDate }: { plan
       try {
         const res = await fetch("/api/macros", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ description: text }) });
         const d = await res.json();
-        macros = d.error ? null : d;
+        if (d.error === "limit_reached") { setLimitMsg(d.detail); macros = null; }
+        else macros = d.error ? null : d;
       } catch { macros = null; }
     }
     const { data: { user } } = await supabase.auth.getUser();
@@ -112,6 +114,7 @@ export default function NutritionView({ plan, initialFood, initialDate }: { plan
               value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") add(); }} />
             <button className="btn" onClick={add} disabled={busy || !input.trim()}>{busy ? "…" : "Add"}</button>
           </div>
+          {limitMsg && <p className="muted" style={{ color: "var(--warn)", fontSize: 12.5, marginBottom: 10 }}>{limitMsg}</p>}
           <p className="muted" style={{ fontSize: 11.5, marginBottom: 16 }}>
             Common foods come from a built-in database (instant and consistent); anything else falls back to an AI estimate.
           </p>
@@ -146,7 +149,7 @@ export default function NutritionView({ plan, initialFood, initialDate }: { plan
                     style={{ width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10,
                       background: "transparent", border: "none", color: "var(--text)", padding: "12px 14px", cursor: "pointer", textAlign: "left" }}>
                     <span style={{ display: "flex", alignItems: "center", gap: 9 }}>
-                      <i style={{ width: 8, height: 8, borderRadius: "50%", background: f.over ? "#e6b877" : "var(--blue)" }} />
+                      <i style={{ width: 8, height: 8, borderRadius: "50%", background: f.over ? "var(--warn)" : "var(--blue)" }} />
                       <span style={{ fontSize: 13.5, fontWeight: 600 }}>{f.label}</span>
                     </span>
                     <span className="mono" style={{ fontSize: 11.5, color: "var(--muted)" }}>{f.val} {f.over ? "vs" : "of"} {f.target}</span>
@@ -154,15 +157,15 @@ export default function NutritionView({ plan, initialFood, initialDate }: { plan
                   {openFlag === f.key && (
                     <div style={{ padding: "0 14px 14px 31px" }}>
                       <div style={{ fontSize: 12.5, color: "#aab2c8", lineHeight: 1.55, marginBottom: 8 }}>{f.why}</div>
-                      {f.worst && <div style={{ fontSize: 12, color: "#e6b877", marginBottom: 8 }}>Mostly from <strong>{f.worst.label}</strong> ({f.worst.amount})</div>}
+                      {f.worst && <div style={{ fontSize: 12, color: "var(--warn)", marginBottom: 8 }}>Mostly from <strong>{f.worst.label}</strong> ({f.worst.amount})</div>}
                       {!!f.culprits?.length && (
                         <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 10 }}>
                           {f.culprits.map((c: string) => (
-                            <span key={c} style={{ fontSize: 11, color: "#e6b877", background: "#2a2418", border: "1px solid #6b5a2e", borderRadius: 99, padding: "3px 9px" }}>{c}</span>
+                            <span key={c} style={{ fontSize: 11, color: "var(--warn)", background: "#2a2418", border: "1px solid #6b5a2e", borderRadius: 99, padding: "3px 9px" }}>{c}</span>
                           ))}
                         </div>
                       )}
-                      <ul style={{ paddingLeft: 18, margin: 0, color: "var(--gold)", display: "flex", flexDirection: "column", gap: 6 }}>
+                      <ul style={{ paddingLeft: 18, margin: 0, color: "var(--accent)", display: "flex", flexDirection: "column", gap: 6 }}>
                         {f.swaps.map((s: string, i: number) => <li key={i} style={{ fontSize: 13, lineHeight: 1.5, color: "#c9cfe0" }}>{s}</li>)}
                       </ul>
                     </div>
@@ -193,7 +196,7 @@ export default function NutritionView({ plan, initialFood, initialDate }: { plan
                         {r.macros?.kcal !== undefined ? `${r.macros.serving ? r.macros.serving + " · " : ""}${r.macros.kcal} kcal · ${r.macros.p}g P · ${r.macros.c}g C · ${r.macros.f}g F` : "no estimate"}
                       </div>
                     </div>
-                    <div className="mono" style={{ fontSize: 15, fontWeight: 600, color: "var(--gold)" }}>{r.macros?.kcal ?? "—"}</div>
+                    <div className="mono" style={{ fontSize: 15, fontWeight: 600, color: "var(--accent)" }}>{r.macros?.kcal ?? "—"}</div>
                     <button onClick={() => remove(r.id)} aria-label="Remove"
                       style={{ background: "none", border: "none", color: "#7a8098", fontSize: 18, cursor: "pointer" }}>×</button>
                   </div>
@@ -215,12 +218,12 @@ export default function NutritionView({ plan, initialFood, initialDate }: { plan
 
       {tab === "plan" && plan?.nutrition && (
         <div>
-          <div className="card" style={{ borderLeft: "3px solid var(--gold)", marginBottom: 16 }}>
+          <div className="card" style={{ borderLeft: "3px solid var(--accent)", marginBottom: 16 }}>
             <span className="eyebrow">Your targets</span>
-            <div className="mono" style={{ fontSize: 12.5, color: "var(--gold)", margin: "8px 0 12px", lineHeight: 1.6 }}>
+            <div className="mono" style={{ fontSize: 12.5, color: "var(--accent)", margin: "8px 0 12px", lineHeight: 1.6 }}>
               {target.kcal} kcal · {target.p} g protein · {target.fiber} g fiber
             </div>
-            <ul style={{ paddingLeft: 18, margin: 0, color: "var(--gold)", display: "flex", flexDirection: "column", gap: 8 }}>
+            <ul style={{ paddingLeft: 18, margin: 0, color: "var(--accent)", display: "flex", flexDirection: "column", gap: 8 }}>
               {(plan?.nutrition?.principles || []).map((p: string, i: number) => (
                 <li key={i} style={{ fontSize: 13, lineHeight: 1.5, color: "#c9cfe0" }}>{p}</li>
               ))}
@@ -229,7 +232,7 @@ export default function NutritionView({ plan, initialFood, initialDate }: { plan
           {(plan?.nutrition?.day_options || []).map((d: any, i: number) => (
             <div key={i} className="card" style={{ marginBottom: 10 }}>
               <div style={{ fontSize: 12.5, fontWeight: 700, color: "#c3cadd", marginBottom: 8 }}>{d.slot}</div>
-              <ul style={{ paddingLeft: 18, margin: 0, color: "var(--gold)", display: "flex", flexDirection: "column", gap: 6 }}>
+              <ul style={{ paddingLeft: 18, margin: 0, color: "var(--accent)", display: "flex", flexDirection: "column", gap: 6 }}>
                 {(d.options || []).map((o: string, j: number) => <li key={j} style={{ fontSize: 13, lineHeight: 1.5, color: "#c9cfe0" }}>{o}</li>)}
               </ul>
             </div>
@@ -253,7 +256,7 @@ export default function NutritionView({ plan, initialFood, initialDate }: { plan
             <div key={i} className="card" style={{ marginBottom: 10 }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 10, flexWrap: "wrap" }}>
                 <strong style={{ fontSize: 14.5 }}>{m.nutrient}</strong>
-                <span className="mono" style={{ fontSize: 12, color: "var(--gold)" }}>{m.target}</span>
+                <span className="mono" style={{ fontSize: 12, color: "var(--accent)" }}>{m.target}</span>
               </div>
               <p className="muted" style={{ margin: "8px 0 0", fontSize: 13 }}>{m.why}</p>
               <p style={{ margin: "8px 0 0", fontSize: 12.5, color: "#c9cfe0" }}><strong style={{ color: "#8a7a4e" }}>Sources: </strong>{m.sources}</p>
@@ -266,12 +269,12 @@ export default function NutritionView({ plan, initialFood, initialDate }: { plan
   );
 }
 
-const Bar = ({ v, color = "var(--gold)" }: { v: number; color?: string }) => (
+const Bar = ({ v, color = "var(--fill)" }: { v: number; color?: string }) => (
   <div style={{ height: 8, background: "#141a2b", border: "1px solid var(--line)", borderRadius: 99, overflow: "hidden" }}>
     <div style={{ height: "100%", width: `${v}%`, background: color }} />
   </div>
 );
 const Chip = ({ label, warn }: { label: string; warn?: boolean }) => (
-  <span className="mono" style={{ fontSize: 11.5, color: warn ? "#e6b877" : "#c9cfe0", background: "#141a2b",
+  <span className="mono" style={{ fontSize: 11.5, color: warn ? "var(--warn)" : "#c9cfe0", background: "#141a2b",
     border: `1px solid ${warn ? "#6b5a2e" : "var(--line)"}`, borderRadius: 99, padding: "4px 10px" }}>{label}</span>
 );

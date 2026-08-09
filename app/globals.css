@@ -1,19 +1,29 @@
-:root{--bg:#0f1220;--panel:#171b2c;--panel2:#1e2338;--line:#2a3150;--gold:#c9a227;
---text:#e7eaf3;--muted:#8b93ac;--green:#57a877;--blue:#7fb0d8;--paper:#f4efe1;--ink:#2b2417;}
+:root{
+/* Citrus — charcoal base, lime-leaning yellow accent.
+   --accent is for buttons and small emphasis (full brightness),
+   --fill is the slightly deeper tone for large areas like the grid. */
+--bg:#101113;--panel:#1a1c1f;--panel2:#22262a;--line:#2b2e33;
+--accent:#e5ff3d;--fill:#c2dd10;
+--ink-on-accent:#161a00;
+--text:#f2f3ef;--muted:#8d9490;
+--green:#6cc39a;--blue:#7fb0d8;--warn:#f0a83c;
+--paper:#f4f3ec;--ink:#1d1f14;}
 *{box-sizing:border-box}
 html,body{margin:0;padding:0;background:var(--bg);color:var(--text);
 font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
-a{color:var(--gold)}
-.container{max-width:840px;margin:0 auto;padding:22px 18px 60px}
+a{color:var(--accent)}
+.container{max-width:840px;margin:0 auto;
+padding:22px 18px calc(80px + env(safe-area-inset-bottom));}
+.head{padding-top:calc(16px + env(safe-area-inset-top))}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px}
 .field{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
 .label{font-size:12.5px;font-weight:600;color:#c3cadd}
 .inp{background:#141a2b;color:var(--text);border:1px solid var(--line);border-radius:8px;
 padding:11px 13px;font-size:14.5px;width:100%;font-family:inherit}
-.inp:focus{outline:2px solid var(--gold);outline-offset:1px}
+.inp:focus{outline:2px solid var(--accent);outline-offset:1px}
 .inp::placeholder{color:#4d5679}
 textarea.inp{resize:vertical}
-.btn{background:var(--gold);color:#191300;border:none;border-radius:8px;padding:12px 18px;
+.btn{background:var(--accent);color:var(--ink-on-accent);border:none;border-radius:8px;padding:12px 18px;
 font-weight:600;font-size:14.5px;cursor:pointer;font-family:inherit}
 .btn:hover:not(:disabled){filter:brightness(1.08)}
 .btn:disabled{opacity:.45;cursor:not-allowed}
@@ -27,16 +37,16 @@ h2{font-size:17px;margin:0 0 10px;font-weight:600}
 .pill{background:var(--panel2);border:1px solid var(--line);color:var(--muted);
 font:600 12px Inter,sans-serif;padding:7px 12px;border-radius:99px;cursor:pointer}
 .pill:hover{color:var(--text);border-color:#3d476b}
-.pill[data-on="true"]{background:var(--gold);color:#191300;border-color:var(--gold)}
+.pill[data-on="true"]{background:var(--accent);color:var(--ink-on-accent);border-color:var(--accent)}
 .tabbar{display:flex;gap:18px;border-bottom:1px solid var(--line);overflow-x:auto;
 white-space:nowrap;padding:0 18px;max-width:840px;margin:0 auto}
 .tabbar a{color:var(--muted);text-decoration:none;font-size:13.5px;font-weight:600;
 padding:12px 2px;border-bottom:2px solid transparent}
-.tabbar a[data-on="true"]{color:var(--text);border-bottom-color:var(--gold)}
+.tabbar a[data-on="true"]{color:var(--text);border-bottom-color:var(--accent)}
 .head{max-width:840px;margin:0 auto;padding:16px 18px 8px;display:flex;
 justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
 .brand{font-weight:600;letter-spacing:.16em;font-size:15px}
 .spinner{display:inline-block;width:14px;height:14px;border:2px solid var(--line);
-border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite;vertical-align:-2px}
+border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;vertical-align:-2px}
 @keyframes spin{to{transform:rotate(360deg)}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}

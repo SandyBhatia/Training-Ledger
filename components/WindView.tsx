@@ -60,12 +60,12 @@ export default function WindView({ rows }: { rows: any[] }) {
           <h1 style={{ fontFamily: "Fraunces, serif" }}>Wind-down</h1>
           <p className="muted" style={{ margin: 0 }}>A ten-minute glide into sleep.</p>
         </div>
-        {streak > 0 && <span className="mono" style={{ fontSize: 12, color: "var(--gold)", border: "1px solid #c9a22755", borderRadius: 99, padding: "5px 11px" }}>{streak}-night streak</span>}
+        {streak > 0 && <span className="mono" style={{ fontSize: 12, color: "var(--accent)", border: "1px solid #c9a22755", borderRadius: 99, padding: "5px 11px" }}>{streak}-night streak</span>}
       </div>
 
       <div style={{ position: "relative", height: 200, display: "grid", placeItems: "center", overflow: "hidden", margin: "10px 0" }}>
         <div style={{ position: "absolute", width: 110, height: 110, borderRadius: "50%",
-          background: "radial-gradient(circle,#212a44,#141a2b)", border: "2px solid var(--gold)",
+          background: "radial-gradient(circle,#212a44,#141a2b)", border: "2px solid var(--accent)",
           transform: `scale(${running ? (phase === "in" ? 1.7 : 1) : 1})`,
           transition: `transform ${running ? (phase === "in" ? PACE.in : PACE.out) : 0.4}s ease-in-out` }} />
         <div style={{ position: "relative", textAlign: "center" }}>
@@ -89,7 +89,7 @@ export default function WindView({ rows }: { rows: any[] }) {
       <div style={{ marginTop: 10, marginBottom: 22 }}>
         {STEPS.map((s) => (
           <div key={s.id} style={{ display: "flex", gap: 11, alignItems: "flex-start", background: items[s.id] ? "#20263c" : "var(--panel)",
-            border: `1px solid ${items[s.id] ? "var(--gold)" : "var(--line)"}`, borderRadius: 9, padding: "11px 12px", marginBottom: 8 }}>
+            border: `1px solid ${items[s.id] ? "var(--accent)" : "var(--line)"}`, borderRadius: 9, padding: "11px 12px", marginBottom: 8 }}>
             <Check on={!!items[s.id]} onClick={() => toggle(s.id)} />
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: 14.5, fontWeight: 600 }}>{s.name} <span className="mono" style={{ fontSize: 11.5, color: "var(--muted)", fontWeight: 400 }}>{s.dur}</span></div>
@@ -110,7 +110,7 @@ export default function WindView({ rows }: { rows: any[] }) {
         ))}
       </div>
 
-      <div className="card" style={{ borderLeft: "3px solid var(--gold)" }}>
+      <div className="card" style={{ borderLeft: "3px solid var(--accent)" }}>
         <span className="eyebrow">Daytime habits that protect sleep</span>
         <p className="muted" style={{ margin: "8px 0 0" }}>
           Bright light in the morning, no caffeine after about 2pm, train earlier rather than late, keep alcohol light.
@@ -126,8 +126,8 @@ function Check({ on, onClick }: { on: boolean; onClick: () => void }) {
   return (
     <button onClick={onClick} aria-pressed={on}
       style={{ width: 24, height: 24, flex: "none", borderRadius: 6, cursor: "pointer",
-        border: `1.5px solid ${on ? "var(--gold)" : "#3a4468"}`, background: on ? "var(--gold)" : "transparent",
-        color: "#191300", fontWeight: 700, fontSize: 13, display: "grid", placeItems: "center" }}>
+        border: `1.5px solid ${on ? "var(--accent)" : "#3a4468"}`, background: on ? "var(--accent)" : "transparent",
+        color: "var(--ink-on-accent)", fontWeight: 700, fontSize: 13, display: "grid", placeItems: "center" }}>
       {on ? "✓" : ""}
     </button>
   );
