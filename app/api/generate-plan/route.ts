@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { createClient } from "@/lib/supabase/server";
 import { screenProfile } from "@/lib/guardrails";
-import { PLAN_SYSTEM, planUserMessage } from "@/lib/prompts";
+import { WORKOUT_SYSTEM, planUserMessage } from "@/lib/prompts";
 import type { Profile } from "@/lib/types";
 
 export const runtime = "nodejs";
@@ -39,8 +39,8 @@ export async function POST(req: Request) {
   try {
     const msg = await anthropic.messages.create({
       model,
-      max_tokens: 10000,
-      system: PLAN_SYSTEM,
+      max_tokens: 8000,
+      system: WORKOUT_SYSTEM,
       messages: [{ role: "user", content: planUserMessage(profile) }],
     });
     const text = msg.content
@@ -76,8 +76,8 @@ export async function POST(req: Request) {
     start_date: startDate,
     weeks: (plan.weeks as number) ?? 12,
     workout: plan.workout ?? null,
-    nutrition: plan.nutrition ?? null,
-    micros: plan.micros ?? null,
+    nutrition: null,
+    micros: null,
     meta: { model, summary: plan.summary, disclaimer: plan.disclaimer },
     active: true,
   }).select().single();

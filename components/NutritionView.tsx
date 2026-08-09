@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { MEALS, mealOf, analyzeDay, lookupLocal, DEFAULT_TARGET, type NutTarget } from "@/lib/food";
 
@@ -7,6 +8,19 @@ type Row = { id: string; log_date: string; meal: string; descr: string; macros: 
 
 export default function NutritionView({ plan, initialFood, initialDate }: { plan: any; initialFood: Row[]; initialDate: string }) {
   const supabase = createClient();
+  const router = useRouter();
+  const [genBusy, setGenBusy] = useState(false);
+  const generateNutrition = async () => {
+    setGenBusy(true);
+    try {
+      await fetch("/api/generate-nutrition", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ plan_id: plan?.id }),
+      });
+      router.refresh();
+    } catch { /* ignore */ }
+    setGenBusy(false);
+  };
   const t = plan?.nutrition?.targets;
   const target: NutTarget = t ? {
     kcal: t.kcal ?? DEFAULT_TARGET.kcal, p: t.protein_g ?? DEFAULT_TARGET.p,
@@ -190,7 +204,16 @@ export default function NutritionView({ plan, initialFood, initialDate }: { plan
         </>
       )}
 
-      {tab === "plan" && (
+      {tab === "plan" && !plan?.nutrition && (
+        <div className="card">
+          <p className="muted" style={{ marginTop: 0 }}>Your nutrition guidance hasn&apos;t been built yet.</p>
+          <button className="btn" onClick={generateNutrition} disabled={genBusy}>
+            {genBusy ? "Building…" : "Build my nutrition plan"}
+          </button>
+        </div>
+      )}
+
+      {tab === "plan" && plan?.nutrition && (
         <div>
           <div className="card" style={{ borderLeft: "3px solid var(--gold)", marginBottom: 16 }}>
             <span className="eyebrow">Your targets</span>
@@ -214,7 +237,16 @@ export default function NutritionView({ plan, initialFood, initialDate }: { plan
         </div>
       )}
 
-      {tab === "micros" && (
+      {tab === "micros" && !plan?.micros?.length && (
+        <div className="card">
+          <p className="muted" style={{ marginTop: 0 }}>Micronutrient guidance hasn&apos;t been built yet.</p>
+          <button className="btn" onClick={generateNutrition} disabled={genBusy}>
+            {genBusy ? "Building…" : "Build micronutrient guidance"}
+          </button>
+        </div>
+      )}
+
+      {tab === "micros" && !!plan?.micros?.length && (
         <div>
           <p className="muted" style={{ marginBottom: 14 }}>Key micronutrients for your calorie level, age, and conditions.</p>
           {(plan?.micros || []).map((m: any, i: number) => (
@@ -227,7 +259,7 @@ export default function NutritionView({ plan, initialFood, initialDate }: { plan
               <p style={{ margin: "8px 0 0", fontSize: 12.5, color: "#c9cfe0" }}><strong style={{ color: "#8a7a4e" }}>Sources: </strong>{m.sources}</p>
             </div>
           ))}
-          {!plan?.micros?.length && <div className="muted">No micronutrient guidance in this plan yet.</div>}
+
         </div>
       )}
     </div>

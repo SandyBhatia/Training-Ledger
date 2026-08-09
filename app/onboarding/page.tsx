@@ -13,6 +13,7 @@ export default function Onboarding() {
   });
   const [pick, setPick] = useState("");
   const [busy, setBusy] = useState(false);
+  const [step, setStep] = useState("");
   const [deferred, setDeferred] = useState("");
   const [err, setErr] = useState("");
 
@@ -32,33 +33,46 @@ export default function Onboarding() {
       ? s.exercise_prefs.filter((x) => x !== id) : [...(s.exercise_prefs || []), id] }));
 
   async function generate() {
-    setBusy(true); setErr(""); setDeferred("");
+    setBusy(true); setErr(""); setDeferred(""); setStep("Designing your training programme…");
     try {
+      // Step 1 — workout. Split from nutrition so each call stays inside
+      // the serverless function time limit.
       const res = await fetch("/api/generate-plan", {
         method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(p),
       });
-
-      // A timeout or crash returns an HTML error page, not JSON — handle that.
       const raw = await res.text();
       let data: any;
       try { data = JSON.parse(raw); }
       catch {
-        setErr(
-          res.status === 504 || res.status === 408
-            ? "The plan took too long to build and the server timed out. Try again — it usually succeeds on a second attempt."
-            : `Server error ${res.status}. ${raw.slice(0, 140)}`
-        );
-        setBusy(false); return;
+        setErr(res.status === 504 || res.status === 408
+          ? "The programme took too long to build and timed out. Please try again."
+          : `Server error ${res.status}. ${raw.slice(0, 140)}`);
+        setBusy(false); setStep(""); return;
       }
-      if (data.deferred) { setDeferred(data.reason); setBusy(false); return; }
+      if (data.deferred) { setDeferred(data.reason); setBusy(false); setStep(""); return; }
       if (data.error) {
-        setErr(data.detail ? `${data.error}: ${data.detail}` : "Something went wrong generating the plan.");
-        setBusy(false); return;
+        setErr(data.detail ? `${data.error}: ${data.detail}` : "Something went wrong building the programme.");
+        setBusy(false); setStep(""); return;
       }
+
+      // Step 2 — nutrition + micronutrients.
+      setStep("Building your nutrition targets…");
+      try {
+        const res2 = await fetch("/api/generate-nutrition", {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ plan_id: data.plan?.id }),
+        });
+        const raw2 = await res2.text();
+        try {
+          const d2 = JSON.parse(raw2);
+          if (d2.error) console.warn("nutrition step failed:", d2);
+        } catch { console.warn("nutrition step returned non-JSON"); }
+      } catch { /* the workout plan is saved; nutrition can be retried later */ }
+
       router.push("/dashboard"); router.refresh();
     } catch (e: unknown) {
       setErr(`Couldn't reach the server: ${e instanceof Error ? e.message : "unknown error"}. Please try again.`);
-      setBusy(false);
+      setBusy(false); setStep("");
     }
   }
 
@@ -245,10 +259,10 @@ export default function Onboarding() {
       {err && <p className="muted" style={{ color: "#e0a3a3", marginTop: 14 }}>{err}</p>}
 
       <button className="btn" style={{ width: "100%", marginTop: 18, padding: 15 }} onClick={generate} disabled={busy}>
-        {busy ? <><span className="spinner" /> &nbsp;Building your plan…</> : "Generate my plan"}
+        {busy ? <><span className="spinner" /> &nbsp;{step || "Building your plan…"}</> : "Generate my plan"}
       </button>
       <p className="muted" style={{ marginTop: 12, fontSize: 11.5 }}>
-        Takes 20–40 seconds. We build a full periodized programme plus nutrition targets and micronutrient guidance from what you entered.
+        Takes up to a minute — the programme and the nutrition guidance are built in two steps.
       </p>
     </div>
   );

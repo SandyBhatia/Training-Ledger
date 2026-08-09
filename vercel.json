@@ -1,6 +1,7 @@
 {
   "functions": {
     "app/api/generate-plan/route.ts": { "maxDuration": 60 },
+    "app/api/generate-nutrition/route.ts": { "maxDuration": 60 },
     "app/api/macros/route.ts": { "maxDuration": 30 }
   }
 }
