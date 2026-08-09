@@ -37,15 +37,27 @@ export default function Onboarding() {
       const res = await fetch("/api/generate-plan", {
         method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(p),
       });
-      const data = await res.json();
+
+      // A timeout or crash returns an HTML error page, not JSON — handle that.
+      const raw = await res.text();
+      let data: any;
+      try { data = JSON.parse(raw); }
+      catch {
+        setErr(
+          res.status === 504 || res.status === 408
+            ? "The plan took too long to build and the server timed out. Try again — it usually succeeds on a second attempt."
+            : `Server error ${res.status}. ${raw.slice(0, 140)}`
+        );
+        setBusy(false); return;
+      }
       if (data.deferred) { setDeferred(data.reason); setBusy(false); return; }
       if (data.error) {
         setErr(data.detail ? `${data.error}: ${data.detail}` : "Something went wrong generating the plan.");
         setBusy(false); return;
       }
       router.push("/dashboard"); router.refresh();
-    } catch {
-      setErr("Network error. Please try again.");
+    } catch (e: unknown) {
+      setErr(`Couldn't reach the server: ${e instanceof Error ? e.message : "unknown error"}. Please try again.`);
       setBusy(false);
     }
   }

@@ -39,6 +39,9 @@ Use Mifflin-St Jeor with an activity factor from days_per_week, then apply the g
 === MICRONUTRIENTS ===
 Based on their calories, sex, age, and conditions, list 5-8 key micronutrients that need attention, each with a practical daily target, why it matters for THEM, and food sources that fit their diet_style.
 
+=== KEEP THE OUTPUT COMPACT ===
+Be efficient: this must fit in a single response. Give ONE entry per split day (not per calendar day), 4-6 exercises per day, and ONE phase entry per week with a short note (max 25 words). Keep "principles" to 6 bullets, "day_options" to one entry per meal slot with 2 options each, and "micros" to 5-6 items with 1-sentence "why" fields. Do not repeat the split for every week.
+
 OUTPUT: reply with ONLY one valid JSON object. No markdown fences, no prose outside it:
 {
   "summary": "2-3 sentences, plain language, specific to them",

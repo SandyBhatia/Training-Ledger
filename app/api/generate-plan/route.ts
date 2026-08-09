@@ -39,7 +39,7 @@ export async function POST(req: Request) {
   try {
     const msg = await anthropic.messages.create({
       model,
-      max_tokens: 16000,
+      max_tokens: 10000,
       system: PLAN_SYSTEM,
       messages: [{ role: "user", content: planUserMessage(profile) }],
     });
