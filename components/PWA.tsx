@@ -10,7 +10,26 @@ export default function PWA() {
 
   useEffect(() => {
     if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("/sw.js").catch(() => {});
+      navigator.serviceWorker.register("/sw.js").then((reg) => {
+        // If a new version is waiting, activate it and reload once so the
+        // page never runs a mix of old and new assets.
+        reg.addEventListener("updatefound", () => {
+          const sw = reg.installing;
+          if (!sw) return;
+          sw.addEventListener("statechange", () => {
+            if (sw.state === "installed" && navigator.serviceWorker.controller) {
+              let reloaded = false;
+              navigator.serviceWorker.addEventListener("controllerchange", () => {
+                if (reloaded) return;
+                reloaded = true;
+                window.location.reload();
+              });
+              sw.postMessage({ type: "SKIP_WAITING" });
+            }
+          });
+        });
+        reg.update();
+      }).catch(() => {});
     }
 
     const dismissed = localStorage.getItem("tl-install-dismissed");

@@ -1,7 +1,7 @@
 /* Training Ledger service worker.
    Network-first for pages and data (health data must never be stale),
    cache-first for static assets, and an offline fallback page. */
-const CACHE = "tl-v1";
+const CACHE = "tl-v2";
 const OFFLINE_URL = "/offline.html";
 const PRECACHE = [OFFLINE_URL, "/icons/icon-192.png", "/icons/icon-512.png", "/manifest.json"];
 
@@ -26,16 +26,18 @@ self.addEventListener("fetch", (event) => {
   // never cache auth or API traffic
   if (url.pathname.startsWith("/api") || url.pathname.startsWith("/auth")) return;
 
-  // Static assets: cache first.
+  // Static assets: serve from cache but refresh in the background
+  // (stale-while-revalidate) so a new deploy is picked up quickly.
   if (url.pathname.startsWith("/_next/static") || url.pathname.startsWith("/icons")) {
     event.respondWith(
-      caches.match(req).then((hit) =>
-        hit || fetch(req).then((res) => {
-          const copy = res.clone();
-          caches.open(CACHE).then((c) => c.put(req, copy));
+      caches.open(CACHE).then(async (cache) => {
+        const hit = await cache.match(req);
+        const net = fetch(req).then((res) => {
+          if (res && res.status === 200) cache.put(req, res.clone());
           return res;
-        })
-      )
+        }).catch(() => hit);
+        return hit || net;
+      })
     );
     return;
   }
@@ -46,4 +48,8 @@ self.addEventListener("fetch", (event) => {
       fetch(req).catch(() => caches.match(OFFLINE_URL).then((r) => r || new Response("Offline", { status: 503 })))
     );
   }
+});
+
+self.addEventListener("message", (event) => {
+  if (event.data && event.data.type === "SKIP_WAITING") self.skipWaiting();
 });

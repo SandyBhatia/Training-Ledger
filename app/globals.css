@@ -7,7 +7,7 @@
 --ink-on-accent:#161a00;
 --text:#f2f3ef;--muted:#8d9490;
 --green:#6cc39a;--blue:#7fb0d8;--warn:#f0a83c;
---paper:#f4f3ec;--ink:#1d1f14;}
+--paper:#f4f3ec;--ink:#1d1f14;--paper-line:#d3d6c4;}
 *{box-sizing:border-box}
 html,body{margin:0;padding:0;background:var(--bg);color:var(--text);
 font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
