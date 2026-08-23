@@ -36,7 +36,11 @@ PROGRAMMING:
 - Anchor compound lifts across the block and progress LOAD; rotate only accessories. Periodize toward their goal with a clear phase arc plus a deload. If target_date is set, peak shortly before it.
 - Every exercise needs a travel/home alternative in "alt".
 
-KEEP IT COMPACT: one entry per split day (not per calendar day), 4-6 exercises each; one phase per week with a note under 25 words.
+KEEP IT COMPACT — this is a hard requirement, the response must be small:
+- ONE entry per split day (never per calendar day), 4-6 exercises each.
+- "warmup", "finisher", "cooldown", "note": one short line each, under 15 words. Omit "note" unless it matters.
+- Exercise "note": omit entirely unless there is a safety cue worth stating.
+- Phases: exactly 4 entries covering blocks of weeks (e.g. weeks 1-3, 4-6, 7-9, 10-12), NOT one per week. Set "week" to the first week of the block. Note under 20 words.
 
 OUTPUT: ONLY one valid JSON object, no markdown fences, no prose outside it:
 {
@@ -46,7 +50,7 @@ OUTPUT: ONLY one valid JSON object, no markdown fences, no prose outside it:
   "workout": {
     "days_per_week": 6,
     "split": [ { "title": "Lower A", "focus": "quads", "warmup": "...", "exercises": [ { "name": "Back Squat", "alt": "DB Goblet Squat", "sets_reps": "4 x 5-8", "rest": "2 min", "note": "" } ], "finisher": "...", "cooldown": "...", "note": "" } ],
-    "phases": [ { "week": 1, "name": "Reintroduction", "rpe": "RPE 6", "note": "...", "deload": false } ]
+    "phases": [ { "week": 1, "name": "Foundation", "rpe": "RPE 6-7", "note": "...", "deload": false }, { "week": 4, "name": "Build", "rpe": "RPE 7-8", "note": "...", "deload": false }, { "week": 7, "name": "Intensify", "rpe": "RPE 8", "note": "...", "deload": false }, { "week": 10, "name": "Peak then deload", "rpe": "RPE 8", "note": "...", "deload": false } ]
   }
 }`;
 

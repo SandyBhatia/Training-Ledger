@@ -36,18 +36,24 @@ export default function Onboarding() {
     setBusy(true); setErr(""); setDeferred(""); setStep("Designing your training programme…");
     try {
       // Step 1 — workout. Split from nutrition so each call stays inside
-      // the serverless function time limit.
-      const res = await fetch("/api/generate-plan", {
-        method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(p),
-      });
-      const raw = await res.text();
-      let data: any;
-      try { data = JSON.parse(raw); }
-      catch {
-        setErr(res.status === 504 || res.status === 408
-          ? "The programme took too long to build and timed out. Please try again."
-          : `Server error ${res.status}. ${raw.slice(0, 140)}`);
-        setBusy(false); setStep(""); return;
+      // the serverless function time limit. Retried once on a timeout,
+      // which is usually transient.
+      let res!: Response, raw = "", data: any = null;
+      for (let attempt = 0; attempt < 2; attempt++) {
+        if (attempt === 1) setStep("Taking longer than usual — retrying…");
+        res = await fetch("/api/generate-plan", {
+          method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(p),
+        });
+        raw = await res.text();
+        try { data = JSON.parse(raw); break; }
+        catch {
+          const timedOut = res.status === 504 || res.status === 408;
+          if (timedOut && attempt === 0) continue;
+          setErr(timedOut
+            ? "The programme took too long to build, twice. Try reducing days per week or session length slightly, then generate again."
+            : `Server error ${res.status}. ${raw.slice(0, 140)}`);
+          setBusy(false); setStep(""); return;
+        }
       }
       if (data.deferred) { setDeferred(data.reason); setBusy(false); setStep(""); return; }
       if (data.error) {

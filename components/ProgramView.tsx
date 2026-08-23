@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { resolveDay, todayIndex, fmtDate, type DayModes } from "@/lib/schedule";
+import { phaseForWeek } from "@/lib/phase";
 
 export default function ProgramView({ profile, plan, logs }: { profile: any; plan: any; logs: any[] }) {
   const [open, setOpen] = useState<Record<number, boolean>>({ 0: true });
@@ -21,7 +22,7 @@ export default function ProgramView({ profile, plan, logs }: { profile: any; pla
   return (
     <div className="container">
       {Array.from({ length: weeks }, (_, w) => {
-        const phase = phases.find((p: any) => p.week === w + 1) || phases[Math.min(phases.length - 1, w)];
+        const phase: any = phaseForWeek(phases, w);
         const days = [0, 1, 2, 3, 4, 5, 6].map((d) => resolveDay(start, w * 7 + d, restDow, modes, split.length, perWeek));
         const done = days.filter((d) => d.isWorkout && doneBy[d.key]).length;
         const total = days.filter((d) => d.isWorkout).length;

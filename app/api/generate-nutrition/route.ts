@@ -31,12 +31,13 @@ export async function POST(req: Request) {
 
   let out: Record<string, unknown>;
   try {
-    const msg = await anthropic.messages.create({
+    const stream = anthropic.messages.stream({
       model,
       max_tokens: 6000,
       system: NUTRITION_SYSTEM,
       messages: [{ role: "user", content: planUserMessage(profile as Profile) }],
     });
+    const msg = await stream.finalMessage();
     const text = msg.content
       .filter((b): b is Anthropic.TextBlock => b.type === "text")
       .map((b) => b.text).join("\n").replace(/```json|```/g, "").trim();

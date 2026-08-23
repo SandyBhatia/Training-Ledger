@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { resolveDay, todayIndex, fmtDate, addDays, demoUrl, type DayModes } from "@/lib/schedule";
+import { phaseForWeek } from "@/lib/phase";
 
 type Log = { log_date: string; done: boolean; day_mode: string | null; payload: any };
 
@@ -41,7 +42,7 @@ export default function TodayView({ profile, plan, logs }: { profile: any; plan:
   const tpl = info.isWorkout ? split[info.splitIndex!] : null;
   const exercises = tpl?.exercises || [];
   const phases = plan?.workout?.phases || [];
-  const phase = phases.find((p: any) => p.week === info.week + 1) || null;
+  const phase: any = phaseForWeek(phases, info.week);
 
   useEffect(() => { setCard(0); setDrag(0); }, [info.key]);
   const cardIdx = exercises.length ? Math.min(card, exercises.length - 1) : 0;

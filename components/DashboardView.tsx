@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { resolveDay, todayIndex, keyOf, fmtDate, DOW_LABELS, type DayModes } from "@/lib/schedule";
+import { phaseForWeek } from "@/lib/phase";
 
 type Log = { log_date: string; done: boolean; day_mode: string | null };
 
@@ -42,7 +43,7 @@ export default function DashboardView({ profile, plan, logs, checkins }: {
   const todayRes = tIdx >= 0 && tIdx < totalDays ? all[tIdx] : null;
   const phases = plan.workout?.phases || [];
   const curWeek = todayRes ? todayRes.week : 0;
-  const phase = phases.find((p: any) => p.week === curWeek + 1) || phases[Math.min(phases.length - 1, curWeek)] || null;
+  const phase = phaseForWeek(phases, curWeek);
 
   const metricSeries = (id: string) =>
     checkins.map((c) => ({ wk: c.week, v: Number(c.metrics?.[id]) })).filter((x) => Number.isFinite(x.v));
