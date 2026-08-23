@@ -1,6 +1,9 @@
 "use client";
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import ProgressPhotos from "./ProgressPhotos";
+import ReviewCard from "./ReviewCard";
+import { buildReview } from "@/lib/review";
 
 const METRICS = [
   { id: "weight", label: "Bodyweight", unit: "lb", down: false },
@@ -12,7 +15,7 @@ const METRICS = [
   { id: "thighs", label: "Thighs", unit: "in", down: false },
 ];
 
-export default function CheckinView({ profile, checkins }: { profile: any; checkins: any[] }) {
+export default function CheckinView({ profile, checkins, photos = [], logs = [] }: { profile: any; checkins: any[]; photos?: any[]; logs?: any[] }) {
   const supabase = createClient();
   const [rows, setRows] = useState<Record<number, any>>(() => {
     const m: Record<number, any> = {};
@@ -36,6 +39,14 @@ export default function CheckinView({ profile, checkins }: { profile: any; check
     setSaving(false);
   };
   const setMetric = (id: string, v: string) => save({ ...(cur.metrics || {}), [id]: v }, cur.feel || "");
+
+  const doneCount = logs.filter((l: any) => l.done).length;
+  const scheduled = logs.filter((l: any) => l.done || l.day_mode !== "rest").length;
+  const adherencePct = scheduled > 0 ? Math.round((doneCount / scheduled) * 100) : null;
+  const review = buildReview(
+    Object.values(rows).map((r: any) => ({ week: r.week, metrics: r.metrics || {}, feel: r.feel })),
+    profile?.goal_type, adherencePct
+  );
 
   const prevWeek = (() => { for (let k = wk - 1; k >= 0; k--) if (rows[k]?.metrics) return rows[k]; return null; })();
 
@@ -88,6 +99,10 @@ export default function CheckinView({ profile, checkins }: { profile: any; check
             placeholder="Energy, recovery, joints, what was too easy or too hard, travel disruptions…" />
         </div>
       </div>
+
+      <ReviewCard review={review} />
+
+      <ProgressPhotos week={wk} rows={photos.filter((p: any) => true)} />
     </div>
   );
 }
