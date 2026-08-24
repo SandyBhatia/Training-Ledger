@@ -23,10 +23,19 @@ const DRILLS = [
   "mountain climber", "plank", "side plank", "pallof press", "monster walk",
   "banded lateral walk", "clamshell", "fire hydrant", "hip airplane",
   "calf raise", "toe touch", "neck roll", "wrist circle", "wrist stretch",
-  // golf / rotational
-  "golf swing rotation", "trunk rotation", "torso twist", "medicine ball rotational throw",
-  "rotational med ball throw", "half-kneeling rotation", "windmill",
-  "standing trunk twist", "hip hinge drill", "swing rehearsal",
+  // golf / rotational — generators phrase these many different ways
+  "golf swing rotation", "golf swing", "golf mobility", "golf-specific mobility",
+  "golf specific mobility", "golf warm-up", "golf warm up", "golf drill",
+  "practice swing", "swing rehearsal", "swing practice", "shadow swing",
+  "trunk rotation", "torso rotation", "torso twist", "standing trunk twist",
+  "seated trunk rotation", "thoracic twist", "spinal rotation", "rotational drill",
+  "rotational throw", "medicine ball rotational throw", "rotational med ball throw",
+  "med ball rotational throw", "medicine ball throw", "med ball twist",
+  "russian twist", "cable rotation", "cable chop", "wood chop", "woodchopper",
+  "pallof press with rotation", "half-kneeling rotation", "windmill",
+  "hip hinge drill", "hip turn", "shoulder turn", "x-factor stretch",
+  "lat stretch with rotation", "side bend", "standing side bend",
+  "wrist mobility", "forearm stretch", "grip warm-up",
 ];
 
 export type Segment = { text: string; drill?: string; url?: string };
@@ -57,6 +66,19 @@ export function parseDrills(input: string): Segment[] {
       from = end;
     }
   }
+  // Fallback: catch unlisted phrases ending in a movement word, e.g.
+  // "scapular retraction drill" or "open-hip rotation".
+  const GENERIC = /([a-z][a-z-]*(?:[\s-]+[a-z][a-z-]*){0,2}[\s-]+(?:rotations?|twists?|stretch(?:es)?|swings?|circles?|drills?|raises?|slides?|bridges?|holds?|walks?))\b/g;
+  let m: RegExpExecArray | null;
+  while ((m = GENERIC.exec(lower)) !== null) {
+    const start = m.index, end = start + m[0].length;
+    const overlaps = hits.some((h) => start < h.end && end > h.start);
+    // skip filler openers so we don't link "and torso twists" or "of leg swings"
+    const first = m[1].split(/\s+/)[0];
+    const filler = ["and", "the", "of", "with", "then", "for", "min", "sec", "each", "per", "x", "to", "some", "a", "an"];
+    if (!overlaps && !filler.includes(first)) hits.push({ start, end, name: m[1] });
+  }
+
   if (!hits.length) return [{ text: input }];
 
   hits.sort((a, b) => a.start - b.start);
