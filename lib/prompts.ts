@@ -35,6 +35,7 @@ PROGRAMMING:
 - Honor days_per_week, session_minutes, experience, equipment, and exercise_prefs.
 - Anchor compound lifts across the block and progress LOAD; rotate only accessories. Periodize toward their goal with a clear phase arc plus a deload. If target_date is set, peak shortly before it.
 - Every exercise needs a travel/home alternative in "alt".
+- In "warmup", "finisher" and "cooldown", name drills using their standard, searchable names (e.g. "world's greatest stretch", "band pull-aparts", "cat-cow", "90/90 hip switch", "couch stretch") rather than vague descriptions, so the user can look them up.
 
 KEEP IT COMPACT — this is a hard requirement, the response must be small:
 - ONE entry per split day (never per calendar day), 4-6 exercises each.

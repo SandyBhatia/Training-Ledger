@@ -3,6 +3,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { resolveDay, todayIndex, fmtDate, addDays, demoUrl, type DayModes } from "@/lib/schedule";
 import { phaseForWeek } from "@/lib/phase";
+import { parseDrills } from "@/lib/drills";
 
 type Log = { log_date: string; done: boolean; day_mode: string | null; payload: any };
 
@@ -14,6 +15,25 @@ const parseRest = (r: string) => {
   return 60;
 };
 const mmss = (sec: number) => { const s = Math.max(0, Math.round(sec)); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`; };
+
+/** Render warm-up / finisher / cool-down text with demo links on known drills. */
+function DrillText({ text }: { text: string }) {
+  return (
+    <>
+      {parseDrills(text).map((seg, i) =>
+        seg.url ? (
+          <a key={i} href={seg.url} target="_blank" rel="noopener noreferrer"
+            title={`Watch a demo of ${seg.drill}`}
+            style={{ color: "var(--ink)", textDecoration: "underline", textDecorationStyle: "dotted", fontWeight: 600 }}>
+            {seg.text}
+          </a>
+        ) : (
+          <span key={i}>{seg.text}</span>
+        )
+      )}
+    </>
+  );
+}
 
 export default function TodayView({ profile, plan, logs }: { profile: any; plan: any; logs: Log[] }) {
   const supabase = createClient();
@@ -208,7 +228,7 @@ export default function TodayView({ profile, plan, logs }: { profile: any; plan:
             </div>
           )}
 
-          {tpl?.warmup && <div style={{ fontSize: 12.5, color: "#3f4634", marginBottom: 12 }}><strong style={{ fontSize: 10, letterSpacing: ".1em", textTransform: "uppercase", color: "#4a5040" }}>Warm-up </strong>{tpl.warmup}</div>}
+          {tpl?.warmup && <div style={{ fontSize: 12.5, color: "#3f4634", marginBottom: 12 }}><strong style={{ fontSize: 10, letterSpacing: ".1em", textTransform: "uppercase", color: "#4a5040" }}>Warm-up </strong><DrillText text={tpl.warmup} /></div>}
 
           {ex && (
             <>
@@ -278,8 +298,8 @@ export default function TodayView({ profile, plan, logs }: { profile: any; plan:
             </>
           )}
 
-          {tpl?.finisher && <div style={{ fontSize: 12.5, color: "#3f4634", marginTop: 14 }}><strong style={{ fontSize: 10, letterSpacing: ".1em", textTransform: "uppercase", color: "#4a5040" }}>Finisher </strong>{tpl.finisher}</div>}
-          {tpl?.cooldown && <div style={{ fontSize: 12.5, color: "#3f4634", marginTop: 10 }}><strong style={{ fontSize: 10, letterSpacing: ".1em", textTransform: "uppercase", color: "#4a5040" }}>Cool-down </strong>{tpl.cooldown}</div>}
+          {tpl?.finisher && <div style={{ fontSize: 12.5, color: "#3f4634", marginTop: 14 }}><strong style={{ fontSize: 10, letterSpacing: ".1em", textTransform: "uppercase", color: "#4a5040" }}>Finisher </strong><DrillText text={tpl.finisher} /></div>}
+          {tpl?.cooldown && <div style={{ fontSize: 12.5, color: "#3f4634", marginTop: 10 }}><strong style={{ fontSize: 10, letterSpacing: ".1em", textTransform: "uppercase", color: "#4a5040" }}>Cool-down </strong><DrillText text={tpl.cooldown} /></div>}
 
           <div style={{ marginTop: 16 }}>
             <span style={{ fontSize: 10, letterSpacing: ".1em", textTransform: "uppercase", color: "#4a5040", fontWeight: 700 }}>Session notes</span>
