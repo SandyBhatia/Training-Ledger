@@ -3,6 +3,7 @@ import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import ProgressPhotos from "./ProgressPhotos";
 import ReviewCard from "./ReviewCard";
+import DoctorSummary from "./DoctorSummary";
 import { buildReview } from "@/lib/review";
 
 const METRICS = [
@@ -15,7 +16,16 @@ const METRICS = [
   { id: "thighs", label: "Thighs", unit: "in", down: false },
 ];
 
-export default function CheckinView({ profile, checkins, photos = [], logs = [] }: { profile: any; checkins: any[]; photos?: any[]; logs?: any[] }) {
+/* Raw, self-reported recovery inputs. Deliberately three simple numbers
+   rather than a device's blended "recovery score" — the raw values are
+   more trustworthy and work for everyone, whatever they wear. */
+const RECOVERY = [
+  { id: "sleep_hrs", label: "Sleep", unit: "hrs/night avg", down: false, hint: "Your rough average this week" },
+  { id: "rhr", label: "Resting heart rate", unit: "bpm", down: true, hint: "First thing in the morning" },
+  { id: "steps", label: "Daily steps", unit: "avg/day", down: false, hint: "From your phone or watch" },
+];
+
+export default function CheckinView({ profile, checkins, photos = [], logs = [], plan = null }: { profile: any; checkins: any[]; photos?: any[]; logs?: any[]; plan?: any }) {
   const supabase = createClient();
   const [rows, setRows] = useState<Record<number, any>>(() => {
     const m: Record<number, any> = {};
@@ -93,6 +103,37 @@ export default function CheckinView({ profile, checkins, photos = [], logs = [] 
             );
           })}
         </div>
+        <div style={{ marginTop: 20, paddingTop: 16, borderTop: "1px solid var(--line)" }}>
+          <span className="eyebrow">Sleep &amp; activity <span style={{ textTransform: "none", letterSpacing: 0, fontWeight: 400 }}>— optional</span></span>
+          <p className="muted" style={{ fontSize: 11.5, margin: "6px 0 12px" }}>
+            Three numbers worth more than any device&apos;s recovery score. Read them off your watch or phone if you have one.
+          </p>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(150px,1fr))", gap: 12 }}>
+            {RECOVERY.map((m) => {
+              const v = cur.metrics?.[m.id] ?? "";
+              const prev = prevWeek ? parseFloat(prevWeek.metrics?.[m.id]) : NaN;
+              const now = parseFloat(v);
+              const delta = Number.isFinite(prev) && Number.isFinite(now) ? +(now - prev).toFixed(1) : null;
+              return (
+                <div key={m.id} className="field" style={{ marginBottom: 0 }}>
+                  <label className="label">{m.label} <span style={{ color: "var(--muted)", fontWeight: 400 }}>({m.unit})</span></label>
+                  <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
+                    <input className="inp mono" inputMode="decimal" placeholder="—" value={v}
+                      onChange={(e) => setMetric(m.id, e.target.value)} />
+                    {delta !== null && delta !== 0 && (
+                      <span className="mono" style={{ position: "absolute", right: 10, fontSize: 12, fontWeight: 600,
+                        color: (m.down ? delta < 0 : delta > 0) ? "var(--green)" : "var(--warn)", pointerEvents: "none" }}>
+                        {delta > 0 ? "+" : ""}{delta}
+                      </span>
+                    )}
+                  </div>
+                  <span className="muted" style={{ fontSize: 10.5 }}>{m.hint}</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
         <div className="field" style={{ marginTop: 18, marginBottom: 0 }}>
           <label className="label">How did the plan feel this week?</label>
           <textarea className="inp" rows={3} value={cur.feel ?? ""} onChange={(e) => save(cur.metrics || {}, e.target.value)}
@@ -103,6 +144,14 @@ export default function CheckinView({ profile, checkins, photos = [], logs = [] 
       <ReviewCard review={review} />
 
       <ProgressPhotos week={wk} rows={photos.filter((p: any) => true)} />
+
+      <DoctorSummary
+        profile={profile}
+        checkins={Object.values(rows) as any[]}
+        plan={plan}
+        adherencePct={adherencePct}
+        sessionsDone={doneCount}
+      />
     </div>
   );
 }
