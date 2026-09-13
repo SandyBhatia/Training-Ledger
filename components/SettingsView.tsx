@@ -2,11 +2,13 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import TravelWindows from "./TravelWindows";
+import PushOptIn from "./PushOptIn";
 import Link from "next/link";
 
 const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
-export default function SettingsView({ profile, plan, logCount }: { profile: any; plan: any; logCount: number }) {
+export default function SettingsView({ profile, plan, logCount, windows = [] }: { profile: any; plan: any; logCount: number; windows?: any[] }) {
   const router = useRouter();
   const [startDate, setStartDate] = useState(plan?.start_date || "");
   const [restDow, setRestDow] = useState<number>(profile?.rest_dow ?? 0);
@@ -131,6 +133,10 @@ export default function SettingsView({ profile, plan, logCount }: { profile: any
           </div>
         )}
       </div>
+
+      <TravelWindows windows={windows} />
+
+      <PushOptIn />
 
       <div className="card" style={{ marginTop: 14 }}>
         <h2>Account</h2>

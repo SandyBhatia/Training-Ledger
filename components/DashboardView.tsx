@@ -2,11 +2,12 @@
 import Link from "next/link";
 import { resolveDay, todayIndex, keyOf, fmtDate, DOW_LABELS, type DayModes } from "@/lib/schedule";
 import { phaseForWeek } from "@/lib/phase";
+import { lifeAdjustedAdherence, forgivingStreak } from "@/lib/travel";
 
 type Log = { log_date: string; done: boolean; day_mode: string | null };
 
-export default function DashboardView({ profile, plan, logs, checkins }: {
-  profile: any; plan: any; logs: Log[]; checkins: any[];
+export default function DashboardView({ profile, plan, logs, checkins, windows = [] }: {
+  profile: any; plan: any; logs: Log[]; checkins: any[]; windows?: any[];
 }) {
   if (!plan) {
     return (
@@ -38,7 +39,23 @@ export default function DashboardView({ profile, plan, logs, checkins }: {
   const scheduled = sessions.filter((d) => d.i <= tIdx).length;
   const doneToDate = sessions.filter((d) => d.i <= tIdx && doneBy[d.key]).length;
   const pct = Math.round((completed / Math.max(1, totalSessions)) * 100);
-  const adherence = scheduled ? Math.round((doneToDate / scheduled) * 100) : 0;
+  const adh = lifeAdjustedAdherence({
+    scheduledKeys: sessions.filter((d) => d.i <= tIdx).map((d) => d.key),
+    doneKeys: new Set(Object.keys(doneBy)),
+    modes: modes as any,
+    travelWindows: windows,
+    easedUntil: profile?.eased_until,
+    start,
+  });
+  const adherence = adh.pct ?? 0;
+  const streak = forgivingStreak({
+    scheduledKeys: sessions.filter((d) => d.i <= tIdx).map((d) => d.key),
+    doneKeys: new Set(Object.keys(doneBy)),
+    modes: modes as any,
+    travelWindows: windows,
+    easedUntil: profile?.eased_until,
+    start,
+  });
 
   const todayRes = tIdx >= 0 && tIdx < totalDays ? all[tIdx] : null;
   const phases = plan.workout?.phases || [];
@@ -70,10 +87,14 @@ export default function DashboardView({ profile, plan, logs, checkins }: {
         <div style={{ marginBottom: 18 }}>
           <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 7 }}>
             <span className="eyebrow">Adherence</span>
-            <span className="mono" style={{ fontSize: 12, color: "var(--muted)" }}>{doneToDate}/{scheduled} · {adherence}%</span>
+            <span className="mono" style={{ fontSize: 12, color: "var(--muted)" }}>{adh.done}/{adh.expected} · {adherence}%</span>
           </div>
           <div style={{ height: 8, background: "#141a2b", border: "1px solid var(--line)", borderRadius: 99, overflow: "hidden" }}>
             <div style={{ height: "100%", width: `${adherence}%`, background: "linear-gradient(90deg,var(--fill),var(--accent))" }} />
+          </div>
+          <div className="muted" style={{ fontSize: 11, marginTop: 6 }}>
+            {adh.label}
+            {streak.days > 0 && <> · {streak.days}-session streak{streak.protectedBy ? ` (held through ${streak.protectedBy})` : ""}</>}
           </div>
         </div>
       )}

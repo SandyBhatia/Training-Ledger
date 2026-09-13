@@ -4,6 +4,8 @@ import { createClient } from "@/lib/supabase/client";
 import { resolveDay, todayIndex, fmtDate, addDays, demoUrl, type DayModes } from "@/lib/schedule";
 import { phaseForWeek } from "@/lib/phase";
 import { parseDrills } from "@/lib/drills";
+import { inTravelWindow, isEased, miniFor, detectLapse } from "@/lib/travel";
+import LapseCheckIn from "./LapseCheckIn";
 
 type Log = { log_date: string; done: boolean; day_mode: string | null; payload: any };
 
@@ -35,7 +37,8 @@ function DrillText({ text }: { text: string }) {
   );
 }
 
-export default function TodayView({ profile, plan, logs }: { profile: any; plan: any; logs: Log[] }) {
+export default function TodayView({ profile, plan, logs, windows = [], lastFood = null }:
+  { profile: any; plan: any; logs: Log[]; windows?: any[]; lastFood?: string | null }) {
   const supabase = createClient();
   const start = new Date((plan?.start_date || new Date().toISOString().slice(0, 10)) + "T00:00:00");
   const restDow = profile?.rest_dow ?? 0;
@@ -60,6 +63,19 @@ export default function TodayView({ profile, plan, logs }: { profile: any; plan:
   const info = resolveDay(start, sel, restDow, modes, split.length, perWeek);
   const day = state[info.key] || { log_date: info.key, done: false, day_mode: null, payload: {} };
   const tpl = info.isWorkout ? split[info.splitIndex!] : null;
+
+  // Travel or an eased patch swaps in the short session — the sequence still
+  // advances, so the programme never has to be "restarted".
+  const trip = inTravelWindow(info.date, windows);
+  const eased = isEased(info.date, profile?.eased_until);
+  const travelMode = !!trip || eased || day.day_mode === "travel";
+  const mini = travelMode && tpl ? miniFor(tpl.title) : null;
+
+  const activityKeys = [
+    ...logs.filter((l) => l.done).map((l) => l.log_date),
+    ...(lastFood ? [lastFood] : []),
+  ];
+  const lapse = detectLapse(activityKeys);
   const exercises = tpl?.exercises || [];
   const phases = plan?.workout?.phases || [];
   const phase: any = phaseForWeek(phases, info.week);
@@ -143,6 +159,10 @@ export default function TodayView({ profile, plan, logs }: { profile: any; plan:
 
   return (
     <div className="container">
+      {lapse.shouldAsk && sel === tIdx && !eased && !trip && (
+        <LapseCheckIn gapDays={lapse.gapDays} />
+      )}
+
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
         <button className="btn ghost" onClick={() => setSel(Math.max(0, sel - 1))} disabled={sel === 0} style={{ padding: "8px 14px" }}>‹</button>
         <div style={{ textAlign: "center" }}>

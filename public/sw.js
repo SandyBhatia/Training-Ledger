@@ -1,7 +1,7 @@
 /* Training Ledger service worker.
    Network-first for pages and data (health data must never be stale),
    cache-first for static assets, and an offline fallback page. */
-const CACHE = "tl-v2";
+const CACHE = "tl-v3";
 const OFFLINE_URL = "/offline.html";
 const PRECACHE = [OFFLINE_URL, "/icons/icon-192.png", "/icons/icon-512.png", "/manifest.json"];
 
@@ -52,4 +52,33 @@ self.addEventListener("fetch", (event) => {
 
 self.addEventListener("message", (event) => {
   if (event.data && event.data.type === "SKIP_WAITING") self.skipWaiting();
+});
+
+
+/* ---- push notifications ---- */
+self.addEventListener("push", (event) => {
+  let data = { title: "Training Ledger", body: "Time to check in.", url: "/today" };
+  try { if (event.data) data = { ...data, ...event.data.json() }; } catch { /* plain text */ }
+  event.waitUntil(
+    self.registration.showNotification(data.title, {
+      body: data.body,
+      icon: "/icons/icon-192.png",
+      badge: "/icons/icon-192.png",
+      tag: "tl-nudge",
+      data: { url: data.url || "/today" },
+    })
+  );
+});
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  const url = (event.notification.data && event.notification.data.url) || "/today";
+  event.waitUntil(
+    self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((list) => {
+      for (const c of list) {
+        if ("focus" in c) { c.navigate(url); return c.focus(); }
+      }
+      return self.clients.openWindow(url);
+    })
+  );
 });
