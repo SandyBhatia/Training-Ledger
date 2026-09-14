@@ -51,3 +51,7 @@ alter table public.profiles add column if not exists eased_until date;
 alter table public.profiles add column if not exists eased_reason text;
 alter table public.profiles add column if not exists nudges_enabled boolean default true;
 alter table public.profiles add column if not exists last_nudge_at timestamptz;
+
+-- ---------------- body composition targets ----------------
+alter table public.profiles add column if not exists target_body_fat numeric;
+alter table public.profiles add column if not exists neck_cm numeric;

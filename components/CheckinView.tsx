@@ -5,15 +5,26 @@ import ProgressPhotos from "./ProgressPhotos";
 import ReviewCard from "./ReviewCard";
 import DoctorSummary from "./DoctorSummary";
 import { buildReview } from "@/lib/review";
+import { bodyCompFor, projectToTarget, bfBand, leanMassCheck } from "@/lib/bodycomp";
 
 const METRICS = [
   { id: "weight", label: "Bodyweight", unit: "lb", down: false },
   { id: "waist", label: "Waist", unit: "in", down: true },
+  { id: "neck", label: "Neck", unit: "in", down: false },
+  { id: "hips", label: "Hips", unit: "in", down: true },
   { id: "arms", label: "Arms", unit: "in", down: false },
   { id: "chest", label: "Chest", unit: "in", down: false },
   { id: "biceps", label: "Biceps", unit: "in", down: false },
   { id: "calves", label: "Calves", unit: "in", down: false },
   { id: "thighs", label: "Thighs", unit: "in", down: false },
+];
+
+/* Optional readings from a gym scale (BIA) or a DEXA scan. These override
+   the tape estimate when present. BIA in particular swings with hydration,
+   so consistency of machine and conditions matters more than the number. */
+const COMPOSITION = [
+  { id: "bf_measured", label: "Body fat", unit: "%", down: true, hint: "From your gym scale or a scan" },
+  { id: "lean_measured", label: "Lean / muscle mass", unit: "lb", down: false, hint: "If your scale reports it" },
 ];
 
 /* Raw, self-reported recovery inputs. Deliberately three simple numbers
@@ -57,6 +68,17 @@ export default function CheckinView({ profile, checkins, photos = [], logs = [],
     Object.values(rows).map((r: any) => ({ week: r.week, metrics: r.metrics || {}, feel: r.feel })),
     profile?.goal_type, adherencePct
   );
+
+  const prevWeekRow = (() => { for (let k = wk - 1; k >= 0; k--) if (rows[k]?.metrics) return rows[k]; return null; })();
+  const comp = bodyCompFor(cur.metrics || {}, profile);
+  const prevComp = prevWeekRow ? bodyCompFor(prevWeekRow.metrics || {}, profile) : null;
+  const leanNote = prevComp ? leanMassCheck(prevComp, comp) : null;
+  const projection = projectToTarget({
+    currentWeightLb: parseFloat(cur.metrics?.weight ?? "") || null,
+    currentBfPct: comp.bodyFatPct,
+    targetBfPct: parseFloat(profile?.target_body_fat ?? "") || null,
+    targetDate: profile?.target_date,
+  });
 
   const prevWeek = (() => { for (let k = wk - 1; k >= 0; k--) if (rows[k]?.metrics) return rows[k]; return null; })();
 
@@ -103,6 +125,40 @@ export default function CheckinView({ profile, checkins, photos = [], logs = [],
             );
           })}
         </div>
+        <div style={{ marginTop: 20, paddingTop: 16, borderTop: "1px solid var(--line)" }}>
+          <span className="eyebrow">Body composition <span style={{ textTransform: "none", letterSpacing: 0, fontWeight: 400 }}>— optional</span></span>
+          <p className="muted" style={{ fontSize: 11.5, margin: "6px 0 12px" }}>
+            Leave blank and we&apos;ll estimate from your waist and neck. If your gym scale or a scan gives you a
+            figure, enter it here and it takes priority.
+          </p>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(150px,1fr))", gap: 12 }}>
+            {COMPOSITION.map((m) => (
+              <div key={m.id} className="field" style={{ marginBottom: 0 }}>
+                <label className="label">{m.label} <span style={{ color: "var(--muted)", fontWeight: 400 }}>({m.unit})</span></label>
+                <input className="inp mono" inputMode="decimal" placeholder="—"
+                  value={cur.metrics?.[m.id] ?? ""} onChange={(e) => setMetric(m.id, e.target.value)} />
+                <span className="muted" style={{ fontSize: 10.5 }}>{m.hint}</span>
+              </div>
+            ))}
+          </div>
+
+          {comp.bodyFatPct !== null && (
+            <div style={{ background: "#141a2b", border: "1px solid var(--line)", borderRadius: 9, padding: "12px 14px", marginTop: 12 }}>
+              <div style={{ display: "flex", gap: 18, flexWrap: "wrap", alignItems: "baseline" }}>
+                <span><span className="mono" style={{ fontSize: 20, fontWeight: 600, color: "var(--accent)" }}>{comp.bodyFatPct}%</span>
+                  <span className="muted" style={{ fontSize: 11, marginLeft: 6 }}>body fat · {bfBand(comp.bodyFatPct, profile?.sex)}</span></span>
+                {comp.leanMassLb !== null && <span className="mono" style={{ fontSize: 13, color: "var(--text)" }}>{comp.leanMassLb} lb lean</span>}
+                {comp.fatMassLb !== null && <span className="mono" style={{ fontSize: 13, color: "var(--muted)" }}>{comp.fatMassLb} lb fat</span>}
+              </div>
+              <p className="muted" style={{ fontSize: 11, margin: "8px 0 0" }}>{comp.note} Track the trend, not the exact figure.</p>
+              {leanNote && <p style={{ fontSize: 12.5, margin: "8px 0 0", color: leanNote.startsWith("Lean mass is up") ? "var(--green)" : "var(--warn)" }}>{leanNote}</p>}
+              {projection.ok && projection.verdict && (
+                <p style={{ fontSize: 12.5, margin: "8px 0 0", color: projection.realistic ? "#c9cfe0" : "var(--warn)", lineHeight: 1.55 }}>{projection.verdict}</p>
+              )}
+            </div>
+          )}
+        </div>
+
         <div style={{ marginTop: 20, paddingTop: 16, borderTop: "1px solid var(--line)" }}>
           <span className="eyebrow">Sleep &amp; activity <span style={{ textTransform: "none", letterSpacing: 0, fontWeight: 400 }}>— optional</span></span>
           <p className="muted" style={{ fontSize: 11.5, margin: "6px 0 12px" }}>

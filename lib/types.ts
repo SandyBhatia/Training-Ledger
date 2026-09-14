@@ -12,6 +12,7 @@ export type Profile = {
   goals?: string;
   goal_type?: string;
   target_date?: string;
+  target_body_fat?: number;
   experience?: string;
   days_per_week?: number;
   session_minutes?: number;

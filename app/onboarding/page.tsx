@@ -193,10 +193,22 @@ export default function Onboarding() {
           <textarea className="inp" rows={2} placeholder="e.g. lose belly fat and build lean muscle before my 50th"
             value={p.goals || ""} onChange={set("goals")} />
         </div>
-        <div className="field">
-          <label className="label">Target date <span style={{ color: "var(--muted)", fontWeight: 400 }}>(optional)</span></label>
-          <input className="inp" type="date" value={p.target_date || ""} onChange={set("target_date")} />
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+          <div className="field">
+            <label className="label">Target body fat % <span style={{ color: "var(--muted)", fontWeight: 400 }}>(optional)</span></label>
+            <input className="inp" type="number" step="0.5" min={8} max={40} placeholder="e.g. 15"
+              value={p.target_body_fat ?? ""} onChange={set("target_body_fat")} />
+          </div>
+          <div className="field">
+            <label className="label">Target date <span style={{ color: "var(--muted)", fontWeight: 400 }}>(optional)</span></label>
+            <input className="inp" type="date" value={p.target_date || ""} onChange={set("target_date")} />
+          </div>
         </div>
+        <p className="muted" style={{ fontSize: 11.5, marginTop: -6, marginBottom: 14 }}>
+          Body fat is a better target than weight — it separates what you want to lose from what you want to keep.
+          Typical bands for men: 15–18% lean and healthy, 12–15% abs visible. For women, add roughly 8–10%.
+          We&apos;ll tell you honestly how long it should take.
+        </p>
       </div>
 
       <div className="card" style={{ marginTop: 14 }}>

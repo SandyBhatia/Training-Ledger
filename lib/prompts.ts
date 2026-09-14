@@ -31,6 +31,8 @@ export const WORKOUT_SYSTEM = `${SHARED_RULES}
 
 YOUR TASK: produce ONLY the training programme.
 
+If target_body_fat is given and requires meaningful fat loss, keep resistance training heavy enough to protect muscle through the deficit and scale conditioning volume to the size of the gap — do not simply add endless cardio.
+
 PROGRAMMING:
 - Honor days_per_week, session_minutes, experience, equipment, and exercise_prefs.
 - Anchor compound lifts across the block and progress LOAD; rotate only accessories. Periodize toward their goal with a clear phase arc plus a deload. If target_date is set, peak shortly before it.
@@ -96,6 +98,7 @@ ${JSON.stringify(
       medications: p.medications,
       goal_type: p.goal_type,
       goal_in_their_words: p.goals,
+      target_body_fat_pct: p.target_body_fat,
       target_date: p.target_date,
       experience: p.experience,
       days_per_week: p.days_per_week,
