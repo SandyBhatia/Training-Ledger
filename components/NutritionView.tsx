@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { MEALS, mealOf, analyzeDay, lookupLocal, DEFAULT_TARGET, type NutTarget } from "@/lib/food";
+import { swapsForEntries } from "@/lib/foodSwaps";
 
 type Row = { id: string; log_date: string; meal: string; descr: string; macros: any };
 
@@ -82,6 +83,7 @@ export default function NutritionView({ plan, initialFood, initialDate }: { plan
     fiber: a.fiber + (e.fiber || 0), sugar: a.sugar + (e.sugar || 0), sodium: a.sodium + (e.sodium || 0), satfat: a.satfat + (e.satfat || 0),
   }), { kcal: 0, p: 0, c: 0, f: 0, fiber: 0, sugar: 0, sodium: 0, satfat: 0 });
   const flags = analyzeDay(tot, entries, target);
+  const itemSwaps = swapsForEntries(entries as any[]);
   const pct = (v: number, x: number) => Math.min(100, Math.round((v / x) * 100));
 
   return (
@@ -172,6 +174,30 @@ export default function NutritionView({ plan, initialFood, initialDate }: { plan
                   )}
                 </div>
               ))}
+            </div>
+          )}
+
+          {itemSwaps.length > 0 && (
+            <div className="card" style={{ marginBottom: 16 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 10 }}>
+                <span className="eyebrow">Better versions of what you ate</span>
+                <span className="mono" style={{ fontSize: 11, color: "var(--muted)" }}>{itemSwaps.length}</span>
+              </div>
+              <p className="muted" style={{ fontSize: 11.5, margin: "6px 0 12px" }}>
+                Like-for-like upgrades — same meal, better version. Nothing here says today was bad.
+              </p>
+              <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
+                {itemSwaps.map((s, i) => (
+                  <div key={i} style={{ background: "#141a2b", border: "1px solid var(--line)", borderRadius: 9, padding: "10px 12px" }}>
+                    <div style={{ fontSize: 13.5, lineHeight: 1.5 }}>
+                      <span style={{ color: "var(--muted)" }}>{s.from}</span>
+                      <span style={{ color: "var(--accent)", margin: "0 7px" }}>→</span>
+                      <strong>{s.to}</strong>
+                    </div>
+                    <p className="muted" style={{ fontSize: 12, margin: "5px 0 0", lineHeight: 1.5 }}>{s.why}</p>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
 

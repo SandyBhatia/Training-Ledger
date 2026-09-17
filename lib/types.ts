@@ -13,6 +13,9 @@ export type Profile = {
   goal_type?: string;
   target_date?: string;
   target_body_fat?: number;
+  waist_in?: number;
+  neck_in?: number;
+  hips_in?: number;
   experience?: string;
   days_per_week?: number;
   session_minutes?: number;

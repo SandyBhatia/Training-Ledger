@@ -1,5 +1,7 @@
 import type { Profile } from "./types";
 import { conditionLabel } from "./conditions";
+import { evidenceFor, evidenceBlock } from "./evidence";
+import { navyBodyFat } from "./bodycomp";
 
 /* The product's brain. Everything hand-tuned over many coaching sessions,
    encoded as explicit, conservative rules. Deliberately non-medical. */
@@ -84,6 +86,17 @@ export function planUserMessage(p: Profile): string {
   const conds = (p.conditions || []).map(conditionLabel);
   if (p.conditions_other) conds.push(p.conditions_other);
 
+  // Current body fat from the tape measurements, so a target has a starting point.
+  const heightIn = p.height_cm ? p.height_cm / 2.54 : null;
+  const currentBf = navyBodyFat({
+    sex: p.sex, waistIn: p.waist_in ?? null, neckIn: p.neck_in ?? null,
+    hipIn: p.hips_in ?? null, heightIn,
+  });
+  const weightLb = p.weight_kg ? +(p.weight_kg * 2.20462).toFixed(1) : null;
+  const leanLb = weightLb && currentBf !== null ? +(weightLb * (1 - currentBf / 100)).toFixed(1) : null;
+
+  const evidence = evidenceBlock(evidenceFor(p.conditions || [], p.goal_type));
+
   return `Build the plan for this person. Apply every safety and condition rule that fits.
 
 ${JSON.stringify(
@@ -98,6 +111,11 @@ ${JSON.stringify(
       medications: p.medications,
       goal_type: p.goal_type,
       goal_in_their_words: p.goals,
+      waist_in: p.waist_in,
+      neck_in: p.neck_in,
+      hips_in: p.hips_in,
+      current_body_fat_pct_estimated: currentBf,
+      current_lean_mass_lb: leanLb,
       target_body_fat_pct: p.target_body_fat,
       target_date: p.target_date,
       experience: p.experience,
@@ -111,6 +129,8 @@ ${JSON.stringify(
     null,
     2
   )}
+
+${evidence}
 
 Return the JSON now.`;
 }

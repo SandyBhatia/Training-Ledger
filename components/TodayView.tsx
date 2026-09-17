@@ -6,6 +6,7 @@ import { phaseForWeek } from "@/lib/phase";
 import { parseDrills } from "@/lib/drills";
 import { inTravelWindow, isEased, miniFor, detectLapse } from "@/lib/travel";
 import LapseCheckIn from "./LapseCheckIn";
+import { variantsFor, KIT_LABEL } from "@/lib/variants";
 
 type Log = { log_date: string; done: boolean; day_mode: string | null; payload: any };
 
@@ -83,6 +84,9 @@ export default function TodayView({ profile, plan, logs, windows = [], lastFood 
   useEffect(() => { setCard(0); setDrag(0); }, [info.key]);
   const cardIdx = exercises.length ? Math.min(card, exercises.length - 1) : 0;
   const ex = exercises[cardIdx];
+  const swappedTo: string | undefined = ex ? day.payload?.swaps?.[ex.name] : undefined;
+  const shownName: string = swappedTo || ex?.name || "";
+  const setCount = ex ? Math.max(1, Math.min(8, parseSets(ex.sets_reps))) : 0;
 
   const save = useCallback(async (patch: Partial<Log>) => {
     const next = { ...day, ...patch, log_date: info.key };
@@ -105,8 +109,29 @@ export default function TodayView({ profile, plan, logs, windows = [], lastFood 
     save({ payload: { ...p, w: { ...(p.w || {}), [id]: v } } });
   };
   const setNotes = (v: string) => save({ payload: { ...(day.payload || {}), notes: v } });
+  const setRep = (id: string, setIdx: number, v: string) => {
+    const p = day.payload || {};
+    const reps = { ...(p.reps || {}) };
+    const arr = [...(reps[id] || [])];
+    arr[setIdx] = v;
+    reps[id] = arr;
+    save({ payload: { ...p, reps } });
+  };
+  // Swapping keeps the slot; we just record what was actually done instead.
+  const swapExercise = (originalName: string, to: string) => {
+    const p = day.payload || {};
+    save({ payload: { ...p, swaps: { ...(p.swaps || {}), [originalName]: to } } });
+    setSwapOpen(null);
+  };
+  const undoSwap = (originalName: string) => {
+    const p = day.payload || {};
+    const swaps = { ...(p.swaps || {}) };
+    delete swaps[originalName];
+    save({ payload: { ...p, swaps } });
+  };
 
   /* ---- timer ---- */
+  const [swapOpen, setSwapOpen] = useState<string | null>(null);
   const [timer, setTimer] = useState<any>(null);
   const [, tick] = useState(0);
   const audio = useRef<AudioContext | null>(null);
@@ -297,6 +322,11 @@ export default function TodayView({ profile, plan, logs, windows = [], lastFood 
                   </div>
                   <div style={{ display: "flex", gap: 8, marginTop: 14, flexWrap: "wrap" }}>
                     <button onClick={() => startEx(ex)} style={{ background: "#241c0d", color: "var(--paper)", border: "none", borderRadius: 6, padding: "8px 13px", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>▶ start</button>
+                    <button onClick={() => setSwapOpen(swapOpen === ex.name ? null : ex.name)}
+                      style={{ background: "transparent", color: "var(--ink)", border: "1.5px solid var(--ink)",
+                        borderRadius: 7, padding: "8px 13px", fontSize: 12.5, fontWeight: 600, cursor: "pointer" }}>
+                      ⇄ swap
+                    </button>
                     <button onClick={() => toggleEx(ex.name)}
                       style={{ background: day.payload?.ex?.[ex.name] ? "var(--green)" : "transparent",
                         color: day.payload?.ex?.[ex.name] ? "#06170e" : "#241c0d",

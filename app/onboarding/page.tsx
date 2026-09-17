@@ -133,8 +133,27 @@ export default function Onboarding() {
             <label className="label">Weight (kg)</label>
             <input className="inp" type="number" value={p.weight_kg ?? ""} onChange={set("weight_kg")} />
           </div>
+          <div className="field">
+            <label className="label">Waist (in)</label>
+            <input className="inp" type="number" step="0.5" placeholder="at the navel" value={p.waist_in ?? ""} onChange={set("waist_in")} />
+          </div>
+          <div className="field">
+            <label className="label">Neck (in)</label>
+            <input className="inp" type="number" step="0.25" placeholder="below the Adam's apple" value={p.neck_in ?? ""} onChange={set("neck_in")} />
+          </div>
+          {p.sex === "female" && (
+            <div className="field">
+              <label className="label">Hips (in)</label>
+              <input className="inp" type="number" step="0.5" placeholder="at the widest point" value={p.hips_in ?? ""} onChange={set("hips_in")} />
+            </div>
+          )}
         </div>
       </div>
+
+      <p className="muted" style={{ fontSize: 11.5, margin: "-4px 0 0" }}>
+        Waist and neck let us estimate your current body fat, which is what makes a target meaningful.
+        Leave them blank if you&apos;d rather not — the plan still works, just with a rougher starting point.
+      </p>
 
       <div className="card" style={{ marginTop: 14 }}>
         <h2>Health</h2>
