@@ -56,6 +56,95 @@ export const FOOD_DB = [
   { n: "cheese", a: ["cheddar", "cheese slice"], s: "1 slice / 20g", kcal: 80, p: 5, c: 1, f: 7, fiber: 0, sugar: 0, sodium: 180, satfat: 4 },
   { n: "whey protein", a: ["protein shake", "protein scoop"], s: "1 scoop", kcal: 120, p: 24, c: 3, f: 1, fiber: 0, sugar: 2, sodium: 60, satfat: 1 },
 
+  // --- nut and seed butters (must be distinct from ghee/butter) ---
+  { n: "almond butter", a: [], s: "1 tbsp", kcal: 98, p: 3, c: 3, f: 9, fiber: 2, sugar: 1, sodium: 1, satfat: 1 },
+  { n: "peanut butter", a: ["pb"], s: "1 tbsp", kcal: 94, p: 4, c: 3, f: 8, fiber: 1, sugar: 1, sodium: 75, satfat: 2 },
+  { n: "cashew butter", a: [], s: "1 tbsp", kcal: 94, p: 3, c: 4, f: 8, fiber: 0, sugar: 1, sodium: 2, satfat: 2 },
+  { n: "tahini", a: ["sesame paste"], s: "1 tbsp", kcal: 89, p: 3, c: 3, f: 8, fiber: 1, sugar: 0, sodium: 5, satfat: 1 },
+  { n: "chia seeds", a: ["chia"], s: "1 tbsp", kcal: 58, p: 2, c: 5, f: 4, fiber: 4, sugar: 0, sodium: 2, satfat: 0 },
+  { n: "pumpkin seeds", a: ["pepitas"], s: "30 g", kcal: 170, p: 9, c: 4, f: 15, fiber: 2, sugar: 0, sodium: 5, satfat: 3 },
+  { n: "sunflower seeds", a: [], s: "30 g", kcal: 165, p: 6, c: 6, f: 14, fiber: 3, sugar: 1, sodium: 3, satfat: 1 },
+  { n: "pistachios", a: ["pista"], s: "30 g", kcal: 159, p: 6, c: 8, f: 13, fiber: 3, sugar: 2, sodium: 1, satfat: 2 },
+  { n: "cashews", a: ["kaju"], s: "30 g", kcal: 157, p: 5, c: 9, f: 12, fiber: 1, sugar: 2, sodium: 3, satfat: 2 },
+  { n: "raisins", a: ["kishmish"], s: "30 g", kcal: 90, p: 1, c: 24, f: 0, fiber: 1, sugar: 18, sodium: 3, satfat: 0 },
+  { n: "dates", a: ["khajoor", "medjool date"], s: "2 pieces", kcal: 133, p: 1, c: 36, f: 0, fiber: 3, sugar: 32, sodium: 1, satfat: 0 },
+
+  // --- spreads, sauces, condiments ---
+  { n: "pesto sauce", a: ["pesto"], s: "1 tbsp", kcal: 80, p: 2, c: 1, f: 8, fiber: 0, sugar: 0, sodium: 160, satfat: 2 },
+  { n: "mayonnaise", a: ["mayo"], s: "1 tbsp", kcal: 94, p: 0, c: 0, f: 10, fiber: 0, sugar: 0, sodium: 88, satfat: 2 },
+  { n: "tomato ketchup", a: ["ketchup"], s: "1 tbsp", kcal: 19, p: 0, c: 5, f: 0, fiber: 0, sugar: 4, sodium: 154, satfat: 0 },
+  { n: "mint chutney", a: ["pudina chutney", "green chutney"], s: "2 tbsp", kcal: 25, p: 1, c: 3, f: 1, fiber: 1, sugar: 1, sodium: 180, satfat: 0 },
+  { n: "coconut chutney", a: [], s: "2 tbsp", kcal: 70, p: 1, c: 3, f: 6, fiber: 2, sugar: 1, sodium: 120, satfat: 5 },
+  { n: "peanut chutney", a: [], s: "2 tbsp", kcal: 85, p: 3, c: 4, f: 7, fiber: 1, sugar: 1, sodium: 140, satfat: 1 },
+  { n: "tamarind chutney", a: ["imli chutney", "sweet chutney"], s: "2 tbsp", kcal: 60, p: 0, c: 15, f: 0, fiber: 1, sugar: 13, sodium: 200, satfat: 0 },
+  { n: "hot sauce", a: ["sriracha"], s: "1 tsp", kcal: 5, p: 0, c: 1, f: 0, fiber: 0, sugar: 1, sodium: 100, satfat: 0 },
+  { n: "salad dressing", a: ["vinaigrette", "ranch dressing"], s: "2 tbsp", kcal: 120, p: 0, c: 2, f: 13, fiber: 0, sugar: 2, sodium: 240, satfat: 2 },
+
+  // --- more Indian dishes ---
+  { n: "besan chilla", a: ["chilla", "moong chilla", "cheela"], s: "2 medium", kcal: 210, p: 11, c: 26, f: 7, fiber: 5, sugar: 2, sodium: 380, satfat: 1 },
+  { n: "khichdi", a: [], s: "1 bowl", kcal: 250, p: 9, c: 42, f: 5, fiber: 5, sugar: 2, sodium: 420, satfat: 1 },
+  { n: "dhokla", a: [], s: "3 pieces", kcal: 160, p: 6, c: 24, f: 4, fiber: 3, sugar: 4, sodium: 400, satfat: 0 },
+  { n: "uttapam", a: [], s: "1 medium", kcal: 190, p: 5, c: 33, f: 4, fiber: 3, sugar: 2, sodium: 340, satfat: 1 },
+  { n: "pav bhaji", a: [], s: "1 plate", kcal: 400, p: 9, c: 52, f: 18, fiber: 7, sugar: 8, sodium: 900, satfat: 8 },
+  { n: "chole bhature", a: ["bhatura"], s: "1 plate", kcal: 650, p: 16, c: 78, f: 30, fiber: 10, sugar: 6, sodium: 1100, satfat: 8 },
+  { n: "biryani", a: ["veg biryani", "chicken biryani"], s: "1 plate", kcal: 480, p: 14, c: 62, f: 18, fiber: 4, sugar: 4, sodium: 850, satfat: 6 },
+  { n: "pulao", a: ["pilaf", "jeera rice"], s: "1 cup", kcal: 240, p: 5, c: 42, f: 6, fiber: 2, sugar: 2, sodium: 380, satfat: 2 },
+  { n: "baingan bharta", a: ["baigan bharta"], s: "1 katori", kcal: 130, p: 3, c: 12, f: 8, fiber: 5, sugar: 5, sodium: 350, satfat: 1 },
+  { n: "aloo gobi", a: [], s: "1 katori", kcal: 150, p: 4, c: 18, f: 8, fiber: 4, sugar: 4, sodium: 380, satfat: 1 },
+  { n: "bhindi masala", a: ["okra"], s: "1 katori", kcal: 130, p: 3, c: 11, f: 9, fiber: 4, sugar: 3, sodium: 330, satfat: 1 },
+  { n: "matar paneer", a: [], s: "1 katori", kcal: 290, p: 13, c: 16, f: 20, fiber: 4, sugar: 6, sodium: 600, satfat: 10 },
+  { n: "tofu bhurji", a: [], s: "1 katori", kcal: 190, p: 18, c: 7, f: 11, fiber: 3, sugar: 3, sodium: 380, satfat: 1 },
+  { n: "sprout salad", a: ["sprouts chaat"], s: "1 cup", kcal: 110, p: 8, c: 16, f: 2, fiber: 5, sugar: 3, sodium: 180, satfat: 0 },
+  { n: "lassi", a: ["sweet lassi", "mango lassi"], s: "1 glass", kcal: 220, p: 6, c: 36, f: 5, fiber: 0, sugar: 32, sodium: 90, satfat: 3 },
+  { n: "masala chai with sugar", a: ["sweet chai", "tea with sugar"], s: "1 cup", kcal: 90, p: 3, c: 13, f: 3, fiber: 0, sugar: 11, sodium: 40, satfat: 2 },
+  { n: "green tea", a: ["herbal tea"], s: "1 cup", kcal: 2, p: 0, c: 0, f: 0, fiber: 0, sugar: 0, sodium: 2, satfat: 0 },
+  { n: "ragi dosa", a: ["ragi", "finger millet"], s: "1 medium", kcal: 145, p: 4, c: 27, f: 3, fiber: 4, sugar: 0, sodium: 280, satfat: 0 },
+  { n: "millet roti", a: ["bajra roti", "jowar roti"], s: "1 medium", kcal: 120, p: 4, c: 22, f: 2, fiber: 4, sugar: 0, sodium: 150, satfat: 0 },
+
+  // --- more Western / continental ---
+  { n: "scrambled eggs", a: [], s: "2 eggs", kcal: 180, p: 13, c: 2, f: 14, fiber: 0, sugar: 1, sodium: 300, satfat: 5 },
+  { n: "egg white omelette", a: [], s: "4 whites", kcal: 70, p: 15, c: 1, f: 0, fiber: 0, sugar: 1, sodium: 220, satfat: 0 },
+  { n: "smoked salmon", a: ["lox"], s: "60 g", kcal: 100, p: 15, c: 0, f: 4, fiber: 0, sugar: 0, sodium: 950, satfat: 1 },
+  { n: "tuna", a: ["canned tuna"], s: "100 g", kcal: 130, p: 29, c: 0, f: 1, fiber: 0, sugar: 0, sodium: 320, satfat: 0 },
+  { n: "shrimp", a: ["prawns"], s: "100 g", kcal: 99, p: 24, c: 0, f: 0, fiber: 0, sugar: 0, sodium: 110, satfat: 0 },
+  { n: "turkey breast", a: [], s: "100 g", kcal: 135, p: 30, c: 0, f: 1, fiber: 0, sugar: 0, sodium: 60, satfat: 0 },
+  { n: "cottage cheese", a: ["low fat cottage cheese"], s: "150 g", kcal: 120, p: 17, c: 5, f: 3, fiber: 0, sugar: 4, sodium: 350, satfat: 2 },
+  { n: "protein bar", a: [], s: "1 bar", kcal: 210, p: 20, c: 22, f: 7, fiber: 5, sugar: 4, sodium: 190, satfat: 3 },
+  { n: "granola", a: [], s: "50 g", kcal: 220, p: 5, c: 32, f: 9, fiber: 4, sugar: 12, sodium: 40, satfat: 2 },
+  { n: "muesli", a: [], s: "50 g", kcal: 190, p: 6, c: 32, f: 4, fiber: 5, sugar: 8, sodium: 30, satfat: 1 },
+  { n: "bagel", a: [], s: "1 medium", kcal: 270, p: 11, c: 53, f: 2, fiber: 2, sugar: 6, sodium: 430, satfat: 0 },
+  { n: "croissant", a: [], s: "1 medium", kcal: 270, p: 5, c: 31, f: 14, fiber: 2, sugar: 7, sodium: 320, satfat: 8 },
+  { n: "sandwich", a: ["veg sandwich", "club sandwich"], s: "1 regular", kcal: 320, p: 12, c: 38, f: 13, fiber: 3, sugar: 5, sodium: 640, satfat: 4 },
+  { n: "wrap", a: ["burrito", "tortilla wrap"], s: "1 regular", kcal: 420, p: 18, c: 48, f: 17, fiber: 5, sugar: 4, sodium: 900, satfat: 5 },
+  { n: "sushi roll", a: ["sushi"], s: "6 pieces", kcal: 250, p: 9, c: 38, f: 6, fiber: 2, sugar: 6, sodium: 500, satfat: 1 },
+  { n: "caesar salad", a: [], s: "1 bowl", kcal: 330, p: 9, c: 12, f: 27, fiber: 3, sugar: 3, sodium: 700, satfat: 6 },
+  { n: "minestrone soup", a: ["tomato soup"], s: "1 bowl", kcal: 130, p: 5, c: 20, f: 3, fiber: 4, sugar: 7, sodium: 680, satfat: 1 },
+  { n: "ice cream", a: [], s: "1 scoop", kcal: 140, p: 2, c: 17, f: 7, fiber: 0, sugar: 15, sodium: 50, satfat: 5 },
+  { n: "dark chocolate", a: [], s: "20 g", kcal: 120, p: 2, c: 9, f: 9, fiber: 2, sugar: 6, sodium: 5, satfat: 5 },
+  { n: "milk chocolate", a: ["chocolate bar"], s: "40 g", kcal: 215, p: 3, c: 24, f: 12, fiber: 1, sugar: 22, sodium: 35, satfat: 7 },
+  { n: "beer", a: [], s: "1 pint", kcal: 208, p: 2, c: 17, f: 0, fiber: 0, sugar: 0, sodium: 20, satfat: 0 },
+  { n: "wine", a: ["red wine", "white wine"], s: "1 glass", kcal: 125, p: 0, c: 4, f: 0, fiber: 0, sugar: 1, sodium: 6, satfat: 0 },
+  { n: "whisky", a: ["whiskey", "vodka", "gin", "rum"], s: "1 peg / 45 ml", kcal: 105, p: 0, c: 0, f: 0, fiber: 0, sugar: 0, sodium: 0, satfat: 0 },
+  { n: "soft drink", a: ["coke", "pepsi", "soda"], s: "1 can", kcal: 140, p: 0, c: 39, f: 0, fiber: 0, sugar: 39, sodium: 45, satfat: 0 },
+  { n: "diet soda", a: ["diet coke", "zero sugar"], s: "1 can", kcal: 0, p: 0, c: 0, f: 0, fiber: 0, sugar: 0, sodium: 40, satfat: 0 },
+  { n: "coconut water", a: ["nariyal pani"], s: "1 cup", kcal: 46, p: 2, c: 9, f: 0, fiber: 3, sugar: 6, sodium: 252, satfat: 0 },
+  { n: "olive oil", a: ["cooking oil"], s: "1 tsp", kcal: 40, p: 0, c: 0, f: 5, fiber: 0, sugar: 0, sodium: 0, satfat: 1 },
+
+  // --- more vegetables and fruit ---
+  { n: "broccoli", a: [], s: "1 cup", kcal: 55, p: 4, c: 11, f: 1, fiber: 5, sugar: 2, sodium: 30, satfat: 0 },
+  { n: "cauliflower", a: ["gobi"], s: "1 cup", kcal: 27, p: 2, c: 5, f: 0, fiber: 2, sugar: 2, sodium: 30, satfat: 0 },
+  { n: "carrot", a: ["gajar"], s: "1 medium", kcal: 25, p: 1, c: 6, f: 0, fiber: 2, sugar: 3, sodium: 42, satfat: 0 },
+  { n: "cucumber", a: ["kheera"], s: "1 medium", kcal: 30, p: 1, c: 7, f: 0, fiber: 1, sugar: 3, sodium: 4, satfat: 0 },
+  { n: "tomato", a: [], s: "1 medium", kcal: 22, p: 1, c: 5, f: 0, fiber: 2, sugar: 3, sodium: 6, satfat: 0 },
+  { n: "sweet potato", a: ["shakarkandi"], s: "1 medium", kcal: 112, p: 2, c: 26, f: 0, fiber: 4, sugar: 5, sodium: 72, satfat: 0 },
+  { n: "potato", a: ["aloo"], s: "1 medium", kcal: 130, p: 3, c: 30, f: 0, fiber: 3, sugar: 1, sodium: 10, satfat: 0 },
+  { n: "corn", a: ["bhutta", "sweetcorn"], s: "1 cup", kcal: 130, p: 5, c: 29, f: 2, fiber: 4, sugar: 5, sodium: 20, satfat: 0 },
+  { n: "mango", a: ["aam"], s: "1 cup", kcal: 99, p: 1, c: 25, f: 0, fiber: 3, sugar: 23, sodium: 2, satfat: 0 },
+  { n: "grapes", a: ["angoor"], s: "1 cup", kcal: 104, p: 1, c: 27, f: 0, fiber: 1, sugar: 23, sodium: 3, satfat: 0 },
+  { n: "watermelon", a: ["tarbooj"], s: "1 cup", kcal: 46, p: 1, c: 12, f: 0, fiber: 1, sugar: 9, sodium: 2, satfat: 0 },
+  { n: "pomegranate", a: ["anaar"], s: "1 cup", kcal: 144, p: 3, c: 33, f: 2, fiber: 7, sugar: 24, sodium: 5, satfat: 0 },
+  { n: "pear", a: ["nashpati"], s: "1 medium", kcal: 101, p: 1, c: 27, f: 0, fiber: 6, sugar: 17, sodium: 2, satfat: 0 },
+
   // --- Chicken / fish / meat (for family members who eat it) ---
   { n: "grilled chicken breast", a: ["chicken breast", "chicken"], s: "100 g", kcal: 165, p: 31, c: 0, f: 4, fiber: 0, sugar: 0, sodium: 74, satfat: 1 },
   { n: "chicken curry", a: ["butter chicken"], s: "1 katori", kcal: 320, p: 22, c: 8, f: 22, fiber: 2, sugar: 4, sodium: 700, satfat: 8 },
@@ -105,7 +194,16 @@ export const FOOD_DB = [
   { n: "olive oil", a: ["cooking oil", "oil"], s: "1 tsp", kcal: 40, p: 0, c: 0, f: 5, fiber: 0, sugar: 0, sodium: 0, satfat: 1 },
 ];
 
-/* quantity-aware local lookup: "2 chapati" -> 2x chapati */
+/* quantity-aware local lookup.
+   Matching is word-boundary based: "almond butter" must not match "butter",
+   and "low fat paneer" must not be treated as plain "paneer". Longest match
+   wins, so specific multi-word entries beat their generic components. */
+function hasTerm(text: string, term: string): boolean {
+  // escape regex metacharacters, then require word boundaries either side
+  const t = term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return new RegExp(`(^|[^a-z])${t}([^a-z]|$)`, "i").test(text);
+}
+
 export function lookupLocal(desc: string): Macros | null {
   const raw = String(desc).toLowerCase().trim();
   const qMatch = raw.match(/^(\d+(?:\.\d+)?)\s*(?:x\s*)?/);
@@ -115,7 +213,7 @@ export function lookupLocal(desc: string): Macros | null {
   let best: any = null; let bestLen = 0;
   for (const f of FOOD_DB) {
     for (const term of [f.n, ...(f.a || [])]) {
-      if (text.includes(term) && term.length > bestLen) { best = f; bestLen = term.length; }
+      if (term.length > bestLen && hasTerm(text, term)) { best = f; bestLen = term.length; }
     }
   }
   if (!best) return null;

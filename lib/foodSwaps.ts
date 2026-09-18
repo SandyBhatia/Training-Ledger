@@ -11,19 +11,26 @@ export type FoodSwap = {
   to: string;           // the better version
   why: string;          // one line, concrete
   tags: string[];       // sugar | sodium | satfat | refined | protein | fibre
+  /* Terms that mean they ALREADY ate the better version. Suggesting an
+     upgrade to something someone has just eaten is the fastest way to make
+     the whole feature feel stupid. */
+  unless?: string[];
 };
 
 export const FOOD_SWAPS: FoodSwap[] = [
   // --- refined carbs → complex ---
   { match: ["potato chaat", "aloo chaat", "aloo tikki"], from: "Potato chaat", to: "Sweet potato chaat",
     why: "Sweet potato is a slower-releasing carb with more fibre — gentler on blood sugar, same dish.", tags: ["refined", "fibre"] },
-  { match: ["white rice", "steamed rice", "chawal"], from: "White rice", to: "Brown rice, quinoa, or half rice + half dal",
+  { match: ["white rice", "steamed rice", "chawal", "rice"], from: "White rice", to: "Brown rice, quinoa, or half rice + half dal",
+    unless: ["brown rice", "quinoa", "millet", "cauliflower rice", "red rice", "black rice"],
     why: "Three to four times the fibre and a flatter glucose curve.", tags: ["refined", "fibre"] },
-  { match: ["paratha"], from: "Paratha", to: "Chapati, or a stuffed paratha cooked dry without ghee",
+  { match: ["paratha", "prantha"], from: "Paratha", to: "Chapati, or a stuffed paratha cooked dry without ghee",
+    unless: ["dry paratha", "no ghee", "chapati", "phulka"],
     why: "Saves roughly 100 kcal and most of the saturated fat.", tags: ["satfat", "kcal"] },
   { match: ["naan", "butter naan"], from: "Naan", to: "Roti or tandoori roti",
     why: "Less refined flour, far less added fat and salt.", tags: ["refined", "sodium", "satfat"] },
   { match: ["white bread", "bread slice"], from: "White bread", to: "Whole-grain or sourdough",
+    unless: ["whole grain", "whole-grain", "wholemeal", "multigrain", "sourdough", "rye"],
     why: "More fibre, slower absorption.", tags: ["refined", "fibre"] },
   { match: ["poha", "upma"], from: "Poha / upma", to: "The same with added peanuts, sprouts or paneer",
     why: "On its own it's mostly carbohydrate — adding protein blunts the spike and keeps you full.", tags: ["protein"] },
@@ -51,12 +58,16 @@ export const FOOD_SWAPS: FoodSwap[] = [
     from: "Creamy paneer curry", to: "Tandoori paneer or paneer tikka",
     why: "Grilled instead of cream-based keeps the protein and drops the saturated fat.", tags: ["satfat"] },
   { match: ["paneer"], from: "Full-fat paneer", to: "Low-fat paneer or tofu",
+    unless: ["low fat paneer", "low-fat paneer", "lowfat paneer", "tofu", "paneer tikka", "tandoori paneer", "grilled paneer"],
     why: "More protein per calorie and much less saturated fat — tofu also helps LDL.", tags: ["satfat", "protein"] },
   { match: ["butter chicken", "chicken curry"], from: "Creamy chicken curry", to: "Tandoori or grilled chicken",
+    unless: ["tandoori", "grilled", "roast chicken"],
     why: "Keeps the protein, loses the cream.", tags: ["satfat"] },
-  { match: ["ghee", "butter"], from: "Ghee or butter", to: "Olive oil or mustard oil for cooking",
+  { match: ["ghee"], from: "Ghee or butter", to: "Olive oil or mustard oil for cooking",
+    unless: ["olive oil", "mustard oil", "almond butter", "peanut butter", "cashew butter", "nut butter"],
     why: "Swapping saturated for unsaturated fat is one of the better-evidenced lipid moves.", tags: ["satfat"] },
   { match: ["cheese"], from: "Cheese", to: "A smaller amount of a stronger cheese, or avocado",
+    unless: ["cottage cheese", "low fat", "paneer"],
     why: "Same satisfaction, less saturated fat.", tags: ["satfat"] },
 
   // --- fried / sodium ---
@@ -73,29 +84,57 @@ export const FOOD_SWAPS: FoodSwap[] = [
 
   // --- protein upgrades ---
   { match: ["curd", "dahi", "yogurt"], from: "Regular curd", to: "Greek yogurt",
+    unless: ["greek yogurt", "greek yoghurt", "hung curd", "skyr"],
     why: "Roughly double the protein for the same volume.", tags: ["protein"] },
   { match: ["milk tea", "chai"], from: "Milk tea", to: "The same, but count it — or a protein-rich snack alongside",
+    unless: ["green tea", "black coffee", "herbal"],
     why: "Fine on its own; the issue is what usually accompanies it.", tags: ["protein"] },
   { match: ["salad"], from: "Plain salad", to: "The same salad with chana, paneer, tofu or egg",
+    unless: ["chicken salad", "paneer salad", "egg salad", "tofu", "sprout", "chana", "caesar"],
     why: "Turns a side into something that actually holds you until the next meal.", tags: ["protein"] },
+  { match: ["granola", "muesli"], from: "Granola", to: "Steel-cut oats with nuts and berries",
+    why: "Most granola is sweetened; oats give you the beta-glucan without the added sugar.", tags: ["sugar"],
+    unless: ["no added sugar", "unsweetened"] },
+  { match: ["mayonnaise", "mayo"], from: "Mayonnaise", to: "Hung curd, hummus or mashed avocado",
+    why: "Similar creaminess, a third of the calories and better fats.", tags: ["kcal", "satfat"] },
+  { match: ["soft drink", "coke", "pepsi", "soda"], from: "Soft drink", to: "Sparkling water with lemon",
+    why: "A can carries roughly 39 g of sugar — the single easiest thing to cut.", tags: ["sugar"],
+    unless: ["diet", "zero", "sparkling water"] },
+  { match: ["tamarind chutney", "sweet chutney", "imli chutney"], from: "Sweet chutney", to: "Mint or coriander chutney",
+    why: "Tamarind chutney is largely sugar; mint chutney adds flavour without it.", tags: ["sugar"] },
+  { match: ["lassi", "mango lassi"], from: "Sweet lassi", to: "Salted chaas, or plain curd with fruit",
+    why: "A sweet lassi carries about as much sugar as a soft drink.", tags: ["sugar"] },
+  { match: ["biryani", "pulao", "fried rice"], from: "Biryani or pulao", to: "The same with a large salad and less rice",
+    why: "Rice-heavy and oil-heavy; the fix is proportion rather than avoidance.", tags: ["kcal"] },
   { match: ["idli", "dosa"], from: "Idli or dosa", to: "The same with extra sambar and a protein side",
+    unless: ["ragi", "millet", "oats dosa"],
     why: "Fermented and steamed is a good base — it just needs protein alongside.", tags: ["protein"] },
 ];
 
 export type MatchedSwap = FoodSwap & { logged: string };
 
 /** Find item-level upgrades for what was actually logged today. */
+function hasWord(text: string, term: string): boolean {
+  const t = term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return new RegExp(`(^|[^a-z])${t}([^a-z]|$)`, "i").test(text);
+}
+
+/** Find item-level upgrades for what was actually logged today.
+    Word-boundary matched, and never suggests something the user already ate. */
 export function swapsForEntries(entries: { item?: string; descr?: string; status?: string }[]): MatchedSwap[] {
   const out: MatchedSwap[] = [];
   const seen = new Set<string>();
 
   for (const e of entries) {
-    const text = `${e.item || ""} ${e.descr || ""}`.toLowerCase();
-    if (!text.trim()) continue;
+    const text = `${e.item || ""} ${e.descr || ""}`.toLowerCase().trim();
+    if (!text) continue;
+
     let best: FoodSwap | null = null, bestLen = 0;
     for (const s of FOOD_SWAPS) {
+      // skip entirely if they already ate the better version
+      if (s.unless?.some((u) => text.includes(u))) continue;
       for (const m of s.match) {
-        if (text.includes(m) && m.length > bestLen) { best = s; bestLen = m.length; }
+        if (m.length > bestLen && hasWord(text, m)) { best = s; bestLen = m.length; }
       }
     }
     if (best && !seen.has(best.to)) {
