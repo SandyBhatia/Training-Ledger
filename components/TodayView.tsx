@@ -305,8 +305,17 @@ export default function TodayView({ profile, plan, logs, windows = [], lastFood 
                 <div style={{ background: day.payload?.ex?.[ex.name] ? "#e4e7d2" : "#eef0e4",
                   border: `1px solid ${day.payload?.ex?.[ex.name] ? "var(--fill)" : "#dcdfcd"}`,
                   borderRadius: 12, padding: 18, transform: `translateX(${drag}px)`, transition: "transform .15s ease" }}>
-                  <div style={{ fontFamily: "Fraunces, serif", fontSize: 20, fontWeight: 600 }}>{ex.name}</div>
-                  {ex.alt && <div style={{ fontSize: 12, color: "#77805a", marginTop: 3 }}>Travel: {ex.alt}</div>}
+                  <div style={{ fontFamily: "Fraunces, serif", fontSize: 20, fontWeight: 600 }}>{shownName}</div>
+                  {swappedTo && (
+                    <div style={{ fontSize: 11.5, color: "#5f6650", marginTop: 3 }}>
+                      swapped from {ex.name} ·{" "}
+                      <button onClick={() => undoSwap(ex.name)}
+                        style={{ background: "none", border: "none", color: "var(--ink)", textDecoration: "underline", fontSize: 11.5, cursor: "pointer", padding: 0 }}>
+                        undo
+                      </button>
+                    </div>
+                  )}
+                  {!swappedTo && ex.alt && <div style={{ fontSize: 12, color: "#77805a", marginTop: 3 }}>Travel: {ex.alt}</div>}
                   <div style={{ display: "flex", gap: 22, margin: "14px 0 6px" }}>
                     <div><div className="mono" style={{ fontSize: 17, fontWeight: 600 }}>{ex.sets_reps}</div><div style={{ fontSize: 10, letterSpacing: ".08em", textTransform: "uppercase", color: "#4a5040" }}>sets × reps</div></div>
                     <div><div className="mono" style={{ fontSize: 17, fontWeight: 600 }}>{ex.rest}</div><div style={{ fontSize: 10, letterSpacing: ".08em", textTransform: "uppercase", color: "#4a5040" }}>rest</div></div>
@@ -320,6 +329,27 @@ export default function TodayView({ profile, plan, logs, windows = [], lastFood 
                         fontFamily: "IBM Plex Mono, monospace", fontSize: 13, color: "var(--ink)", textAlign: "right" }} />
                     <span className="mono" style={{ fontSize: 11, color: "#77805a" }}>{profile?.units || "lbs"}</span>
                   </div>
+
+                  <div style={{ margin: "12px 0 2px" }}>
+                    <span style={{ fontSize: 10.5, letterSpacing: ".08em", textTransform: "uppercase", color: "#4a5040", fontWeight: 700 }}>
+                      Reps done
+                    </span>
+                    <div style={{ display: "flex", gap: 6, marginTop: 6, flexWrap: "wrap" }}>
+                      {Array.from({ length: setCount }, (_, i) => (
+                        <span key={i} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3 }}>
+                          <input inputMode="numeric" placeholder="—"
+                            value={day.payload?.reps?.[ex.name]?.[i] ?? ""}
+                            onChange={(e) => setRep(ex.name, i, e.target.value)}
+                            aria-label={`Reps for set ${i + 1}`}
+                            style={{ width: 46, background: "#f7f8f0", border: "1px solid #cfd3c0", borderRadius: 6,
+                              padding: "7px 4px", fontFamily: "IBM Plex Mono, monospace", fontSize: 13,
+                              color: "var(--ink)", textAlign: "center" }} />
+                          <span className="mono" style={{ fontSize: 9.5, color: "#77805a" }}>s{i + 1}</span>
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
                   <div style={{ display: "flex", gap: 8, marginTop: 14, flexWrap: "wrap" }}>
                     <button onClick={() => startEx(ex)} style={{ background: "#241c0d", color: "var(--paper)", border: "none", borderRadius: 6, padding: "8px 13px", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>▶ start</button>
                     <button onClick={() => setSwapOpen(swapOpen === ex.name ? null : ex.name)}
@@ -335,7 +365,35 @@ export default function TodayView({ profile, plan, logs, windows = [], lastFood 
                       {day.payload?.ex?.[ex.name] ? "✓ done" : "mark done"}
                     </button>
                   </div>
-                  <a href={demoUrl(ex.name)} target="_blank" rel="noopener noreferrer"
+                  {swapOpen === ex.name && (
+                    <div style={{ marginTop: 12, background: "#f7f8f0", border: "1px solid #cfd3c0", borderRadius: 9, padding: "12px 13px" }}>
+                      <div style={{ fontSize: 11, letterSpacing: ".08em", textTransform: "uppercase", color: "#4a5040", fontWeight: 700, marginBottom: 8 }}>
+                        Swap for something that trains the same thing
+                      </div>
+                      {variantsFor(ex.name).length === 0 ? (
+                        <div style={{ fontSize: 12.5, color: "#5f6650" }}>
+                          No close alternatives for this one — skip it, or use the travel version.
+                        </div>
+                      ) : (
+                        <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                          {variantsFor(ex.name).map((v) => (
+                            <button key={v.name} onClick={() => swapExercise(ex.name, v.name)}
+                              style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10,
+                                background: "#eef0e4", border: "1px solid #dcdfcd", borderRadius: 7,
+                                padding: "9px 11px", cursor: "pointer", textAlign: "left", color: "var(--ink)" }}>
+                              <span style={{ fontSize: 13.5, fontWeight: 600 }}>{v.name}</span>
+                              <span className="mono" style={{ fontSize: 10.5, color: "#77805a" }}>{KIT_LABEL[v.kit]}</span>
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                      <div style={{ fontSize: 11, color: "#5f6650", marginTop: 9 }}>
+                        Same sets and reps apply. Your sequence and progress are unaffected.
+                      </div>
+                    </div>
+                  )}
+
+                  <a href={demoUrl(shownName)} target="_blank" rel="noopener noreferrer"
                     style={{ display: "inline-block", marginTop: 12, fontSize: 11.5, fontWeight: 600, color: "var(--ink)", textDecoration: "underline" }}>▶ watch demo</a>
                 </div>
               </div>
