@@ -16,6 +16,10 @@ export type Profile = {
   waist_in?: number;
   neck_in?: number;
   hips_in?: number;
+  split_style?: string;
+  custom_days?: string[][];
+  sport?: string;
+  sport_minutes?: number;
   experience?: string;
   days_per_week?: number;
   session_minutes?: number;

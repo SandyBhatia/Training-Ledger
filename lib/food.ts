@@ -1,4 +1,5 @@
 import type { Macros } from "./types";
+import { INDB } from "./indb";
 
 export type NutTarget = { kcal: number; p: number; c: number; f: number; fiber: number; sugar: number; sodium: number; satfat: number };
 export const DEFAULT_TARGET: NutTarget = { kcal: 2000, p: 130, c: 200, f: 60, fiber: 30, sugar: 35, sodium: 2000, satfat: 20 };
@@ -14,7 +15,7 @@ export const FOOD_DB = [
   { n: "white rice", a: ["chawal", "steamed rice", "rice"], s: "1 cup cooked", kcal: 205, p: 4, c: 45, f: 0, fiber: 1, sugar: 0, sodium: 2, satfat: 0 },
   { n: "brown rice", a: [], s: "1 cup cooked", kcal: 216, p: 5, c: 45, f: 2, fiber: 4, sugar: 0, sodium: 10, satfat: 0 },
   { n: "idli", a: [], s: "2 pieces", kcal: 116, p: 4, c: 24, f: 1, fiber: 2, sugar: 0, sodium: 260, satfat: 0 },
-  { n: "plain dosa", a: ["dosa", "masala dosa", "mysore dosa"], s: "1 medium", kcal: 168, p: 4, c: 29, f: 4, fiber: 2, sugar: 1, sodium: 300, satfat: 1 },
+  { n: "plain dosa", a: ["dosa"], s: "1 medium", kcal: 168, p: 4, c: 29, f: 4, fiber: 2, sugar: 1, sodium: 300, satfat: 1 },
   { n: "millet dosa", a: ["ragi dosa"], s: "1 medium", kcal: 150, p: 5, c: 26, f: 3, fiber: 4, sugar: 0, sodium: 280, satfat: 0 },
   { n: "poha", a: [], s: "1 cup", kcal: 250, p: 5, c: 45, f: 6, fiber: 3, sugar: 2, sodium: 400, satfat: 1 },
   { n: "upma", a: [], s: "1 cup", kcal: 250, p: 6, c: 40, f: 8, fiber: 3, sugar: 2, sodium: 450, satfat: 2 },
@@ -194,35 +195,89 @@ export const FOOD_DB = [
   { n: "olive oil", a: ["cooking oil", "oil"], s: "1 tsp", kcal: 40, p: 0, c: 0, f: 5, fiber: 0, sugar: 0, sodium: 0, satfat: 1 },
 ];
 
-/* quantity-aware local lookup.
-   Matching is word-boundary based: "almond butter" must not match "butter",
-   and "low fat paneer" must not be treated as plain "paneer". Longest match
-   wins, so specific multi-word entries beat their generic components. */
+/* Lookup.
+
+   Two tables: the curated list above (Western staples, brand-agnostic basics)
+   and the 1,001-dish ICMR-derived Indian database. Matching is word-boundary
+   based and prefers the longest match, so "paneer dosa" resolves to the dish
+   rather than to its component "paneer" — returning a component's macros for
+   a composite dish is worse than returning nothing, because it is confidently
+   wrong rather than honestly absent. */
+
+const VARIANTS: [RegExp, string][] = [
+  [/\bparantha\b/g, "paratha"], [/\bprantha\b/g, "paratha"],
+  [/\bchappati\b/g, "chapati"], [/\brotis\b/g, "roti"],
+  [/\bdaal\b/g, "dal"], [/\brajmah\b/g, "rajma"],
+  [/\bchhole\b/g, "chole"], [/\bpanner\b/g, "paneer"],
+  [/\byoghurt\b/g, "yogurt"], [/\bbiriyani\b/g, "biryani"],
+];
+export function normaliseFood(s: string): string {
+  let out = s.toLowerCase();
+  for (const [re, to] of VARIANTS) out = out.replace(re, to);
+  return out;
+}
+
 function hasTerm(text: string, term: string): boolean {
-  // escape regex metacharacters, then require word boundaries either side
   const t = term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   return new RegExp(`(^|[^a-z])${t}([^a-z]|$)`, "i").test(text);
 }
+
+/** Words in the query that no candidate accounted for. Used to reject a
+    component match when the query clearly describes something more. */
+function unmatchedWords(text: string, term: string): number {
+  const stop = new Set(["a","an","the","of","with","and","some","my","plus","in","on","1","2","3","half","small","large","medium","cup","bowl","plate","piece","katori","serving","grams","gram","g","ml"]);
+  const termWords = new Set(term.split(/[^a-z]+/).filter(Boolean));
+  return text.split(/[^a-z]+/).filter((w) => w && !stop.has(w) && !termWords.has(w)).length;
+}
+
+type Row = { n: string; a: string[]; s: string; kcal: number; p: number; c: number; f: number; fiber: number; sugar: number; sodium: number; satfat: number };
 
 export function lookupLocal(desc: string): Macros | null {
   const raw = String(desc).toLowerCase().trim();
   const qMatch = raw.match(/^(\d+(?:\.\d+)?)\s*(?:x\s*)?/);
   const qty = qMatch ? parseFloat(qMatch[1]) : 1;
-  const text = raw.replace(/^(\d+(?:\.\d+)?)\s*(?:x\s*)?/, "").trim();
+  let text = raw.replace(/^(\d+(?:\.\d+)?)\s*(?:x\s*)?/, "").trim();
+  if (!text) return null;
+  // spelling variants that would otherwise miss a real entry
+  text = normaliseFood(text);
 
-  let best: any = null; let bestLen = 0;
-  for (const f of FOOD_DB) {
-    for (const term of [f.n, ...(f.a || [])]) {
-      if (term.length > bestLen && hasTerm(text, term)) { best = f; bestLen = term.length; }
+  let best: Row | null = null, bestLen = 0;
+  const consider = (rows: Row[]) => {
+    for (const r of rows) {
+      for (const raw of [r.n, ...(r.a || [])]) {
+        const term = normaliseFood(raw);
+        if (term.length > bestLen && hasTerm(text, term)) { best = r as Row; bestLen = term.length; }
+      }
+    }
+  };
+  consider(INDB as unknown as Row[]);
+  // Curated entries are hand-checked, so they win ties against bulk data.
+  const indbLen = bestLen;
+  for (const r of FOOD_DB as unknown as Row[]) {
+    for (const raw of [r.n, ...(r.a || [])]) {
+      const term = normaliseFood(raw);
+      if (term.length >= bestLen && hasTerm(text, term)) { best = r; bestLen = term.length; }
     }
   }
+  void indbLen;
   if (!best) return null;
-  const mul = (v: number) => Math.round((v || 0) * qty);
+
+  /* Guard against component matches. If the query has two or more meaningful
+     words the match didn't cover ("paneer dosa" matched only "paneer"), fall
+     through to the AI estimate instead of answering with the wrong dish. */
+  const b0 = best as Row;
+  const fullName = normaliseFood(`${b0.n} ${(b0.a || []).join(" ")}`);
+  const coversAll = unmatchedWords(text, fullName) === 0;
+  const leftover = unmatchedWords(text, b0.n);
+  if (!coversAll && leftover >= 1 && bestLen < text.length * 0.6) return null;
+
+  const b = best as Row;
+  const mul = (v: number) => Math.round((v || 0) * qty * 10) / 10;
   return {
-    item: qty === 1 ? best.n : `${qty} × ${best.n}`,
-    serving: qty === 1 ? best.s : `${qty} × ${best.s}`,
-    kcal: mul(best.kcal), p: mul(best.p), c: mul(best.c), f: mul(best.f),
-    fiber: mul(best.fiber), sugar: mul(best.sugar), sodium: mul(best.sodium), satfat: mul(best.satfat),
+    item: qty === 1 ? b.n : `${qty} × ${b.n}`,
+    serving: qty === 1 ? b.s : `${qty} × ${b.s}`,
+    kcal: Math.round((b.kcal || 0) * qty), p: mul(b.p), c: mul(b.c), f: mul(b.f),
+    fiber: mul(b.fiber), sugar: mul(b.sugar), sodium: Math.round((b.sodium || 0) * qty), satfat: mul(b.satfat),
     src: "db",
   };
 }

@@ -37,6 +37,12 @@ If target_body_fat is given and requires meaningful fat loss, keep resistance tr
 
 PROGRAMMING:
 - Honor days_per_week, session_minutes, experience, equipment, and exercise_prefs.
+- SPLIT STYLE is chosen by the user and must be respected exactly:
+  "upper_lower" = alternate upper-body and lower-body days.
+  "ppl" = push (chest/shoulders/triceps), pull (back/biceps), legs, repeating.
+  "full_body" = every session trains the whole body.
+  "custom" = custom_days gives the muscle groups for each day IN ORDER; build each day from exactly those groups and nothing else.
+  "auto" or absent = choose whatever suits their days, goal and equipment.
 - Anchor compound lifts across the block and progress LOAD; rotate only accessories. Periodize toward their goal with a clear phase arc plus a deload. If target_date is set, peak shortly before it.
 - Every exercise needs a travel/home alternative in "alt".
 - In "warmup", "finisher" and "cooldown", name drills using their standard, searchable names (e.g. "world's greatest stretch", "band pull-aparts", "cat-cow", "90/90 hip switch", "couch stretch") rather than vague descriptions, so the user can look them up.
@@ -122,6 +128,8 @@ ${JSON.stringify(
       days_per_week: p.days_per_week,
       session_minutes: p.session_minutes,
       exercise_preferences: p.exercise_prefs,
+      split_style: p.split_style || "auto",
+      custom_days: p.custom_days || null,
       equipment: p.equipment,
       diet_style: p.diet_style,
       allergies: p.allergies,

@@ -6,6 +6,7 @@ import { phaseForWeek } from "@/lib/phase";
 import { parseDrills } from "@/lib/drills";
 import { inTravelWindow, isEased, miniFor, detectLapse } from "@/lib/travel";
 import LapseCheckIn from "./LapseCheckIn";
+import SportRoutine from "./SportRoutine";
 import { variantsFor, KIT_LABEL } from "@/lib/variants";
 
 type Log = { log_date: string; done: boolean; day_mode: string | null; payload: any };
@@ -109,6 +110,12 @@ export default function TodayView({ profile, plan, logs, windows = [], lastFood 
     save({ payload: { ...p, w: { ...(p.w || {}), [id]: v } } });
   };
   const setNotes = (v: string) => save({ payload: { ...(day.payload || {}), notes: v } });
+  const toggleMobility = (name: string) => {
+    const p2 = day.payload || {};
+    const mob = { ...(p2.mobility || {}) };
+    mob[name] = !mob[name];
+    save({ payload: { ...p2, mobility: mob } });
+  };
   const setRep = (id: string, setIdx: number, v: string) => {
     const p = day.payload || {};
     const reps = { ...(p.reps || {}) };
@@ -418,6 +425,9 @@ export default function TodayView({ profile, plan, logs, windows = [], lastFood 
           </div>
         </div>
       )}
+      <SportRoutine sportId={profile?.sport} dayKey={info.key}
+        done={day.payload?.mobility || {}} onToggle={toggleMobility} />
+
     </div>
   );
 }

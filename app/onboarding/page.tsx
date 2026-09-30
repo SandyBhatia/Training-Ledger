@@ -2,6 +2,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { CONDITION_GROUPS, GOAL_TYPES, EXERCISE_PREFS, EQUIPMENT, DIET_STYLES, conditionLabel } from "@/lib/conditions";
+import { SPLIT_STYLES, MUSCLE_GROUPS, CUSTOM_PRESETS, type MuscleGroup } from "@/lib/splits";
+import { SPORTS } from "@/lib/sports";
 import type { Profile } from "@/lib/types";
 
 export default function Onboarding() {
@@ -10,7 +12,20 @@ export default function Onboarding() {
     conditions: [], exercise_prefs: [], experience: "some", days_per_week: 5,
     session_minutes: 60, equipment: "full_gym", diet_style: "veg_egg", goal_type: "recomp", rest_dow: 0,
     start_date: new Date().toISOString().slice(0, 10),
+    split_style: "auto", sport: "", sport_minutes: 15,
   });
+
+  const days = Math.max(2, Math.min(6, p.days_per_week || 5));
+  const customDays: MuscleGroup[][] = (p.custom_days as MuscleGroup[][] | undefined)
+    ?? CUSTOM_PRESETS[days] ?? CUSTOM_PRESETS[5];
+  const setCustomDay = (i: number, g: MuscleGroup) =>
+    setP((s) => {
+      const base = ((s.custom_days as MuscleGroup[][] | undefined) ?? CUSTOM_PRESETS[days] ?? CUSTOM_PRESETS[5]).map((d) => [...d]);
+      while (base.length < days) base.push([]);
+      const day = base[i] || [];
+      base[i] = day.includes(g) ? day.filter((x) => x !== g) : [...day, g];
+      return { ...s, custom_days: base.slice(0, days) };
+    });
   const [pick, setPick] = useState("");
   const [busy, setBusy] = useState(false);
   const [step, setStep] = useState("");
@@ -271,6 +286,61 @@ export default function Onboarding() {
           <input className="inp" type="date" value={p.start_date || ""} onChange={set("start_date")} />
           <span className="muted" style={{ fontSize: 11.5 }}>Day 1 of your programme. Pick a date you&apos;ll realistically begin.</span>
         </div>
+        <div className="field">
+          <label className="label">How should the week be structured?</label>
+          <div style={{ display: "flex", flexDirection: "column", gap: 7, marginTop: 4 }}>
+            {SPLIT_STYLES.map((st) => (
+              <button key={st.id} type="button" onClick={() => setP((s) => ({ ...s, split_style: st.id }))}
+                className="btn ghost"
+                style={{ textAlign: "left", padding: "11px 13px",
+                  borderColor: p.split_style === st.id ? "var(--accent)" : "var(--line)" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
+                  <strong style={{ fontSize: 13.5, color: p.split_style === st.id ? "var(--accent)" : "var(--text)" }}>{st.label}</strong>
+                  <span className="muted" style={{ fontSize: 11 }}>{st.bestFor}</span>
+                </div>
+                <div className="muted" style={{ fontSize: 12, marginTop: 3 }}>{st.blurb}</div>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {p.split_style === "custom" && (
+          <div className="field">
+            <label className="label">Pick the muscle groups for each day</label>
+            <p className="muted" style={{ fontSize: 11.5, margin: "2px 0 10px" }}>
+              Starting from a sensible {days}-day template — change whatever you like. You can still swap individual
+              exercises once the plan is built.
+            </p>
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              {Array.from({ length: days }, (_, i) => (
+                <div key={i} style={{ background: "var(--panel2)", border: "1px solid var(--line)", borderRadius: 9, padding: "10px 12px" }}>
+                  <div className="eyebrow" style={{ marginBottom: 8 }}>Day {i + 1}</div>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                    {MUSCLE_GROUPS.map((g) => (
+                      <button key={g.id} type="button" className="pill"
+                        data-on={(customDays[i] || []).includes(g.id)}
+                        onClick={() => setCustomDay(i, g.id)}
+                        style={{ fontSize: 11.5, padding: "5px 10px" }}>{g.label}</button>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <div className="field">
+          <label className="label">Daily sport mobility <span style={{ color: "var(--muted)", fontWeight: 400 }}>(optional)</span></label>
+          <p className="muted" style={{ fontSize: 11.5, margin: "2px 0 8px" }}>
+            A short routine that runs every day alongside your training, including rest days — mobility responds to
+            frequency more than intensity.
+          </p>
+          <select className="inp" value={p.sport || ""} onChange={set("sport")}>
+            <option value="">None</option>
+            {SPORTS.map((sp) => <option key={sp.id} value={sp.id}>{sp.label} — {sp.minutes} min</option>)}
+          </select>
+        </div>
+
         <div className="field">
           <label className="label">Preferred rest day</label>
           <select className="inp" value={p.rest_dow} onChange={(e) => setP((s) => ({ ...s, rest_dow: Number(e.target.value) }))}>

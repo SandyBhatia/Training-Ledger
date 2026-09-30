@@ -74,3 +74,9 @@ create index if not exists coach_msgs_user_time on public.coach_messages (user_i
 alter table public.profiles add column if not exists waist_in numeric;
 alter table public.profiles add column if not exists neck_in numeric;
 alter table public.profiles add column if not exists hips_in numeric;
+
+-- ---------------- split style, custom days, sport ----------------
+alter table public.profiles add column if not exists split_style text default 'auto';
+alter table public.profiles add column if not exists custom_days jsonb;
+alter table public.profiles add column if not exists sport text;
+alter table public.profiles add column if not exists sport_minutes int default 15;

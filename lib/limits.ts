@@ -3,7 +3,11 @@ import { createClient } from "./supabase/server";
 /** Usage caps. Generous for normal use; they exist to stop runaway API spend,
     not to ration honest users. Raise these freely. */
 export const LIMITS = {
-  PLANS_PER_30_DAYS: 5,
+  /* Plan generation is uncapped — this is a private app for a couple of
+     people, and being told to wait 30 days to rebuild your own plan is
+     absurd. The food-lookup cap stays: it guards against a runaway loop
+     rather than limiting normal use (local database hits don't count). */
+  PLANS_PER_30_DAYS: Infinity,
   AI_MACROS_PER_DAY: 100,
 };
 
@@ -11,6 +15,9 @@ type Check = { ok: boolean; used: number; limit: number; message?: string };
 
 /** Plan generations in the last 30 days (counted from stored plans). */
 export async function checkPlanLimit(userId: string, allowance = 0): Promise<Check> {
+  if (!Number.isFinite(LIMITS.PLANS_PER_30_DAYS)) {
+    return { ok: true, used: 0, limit: Infinity };
+  }
   const supabase = await createClient();
   const since = new Date(Date.now() - 30 * 86400000).toISOString();
   const { count } = await supabase

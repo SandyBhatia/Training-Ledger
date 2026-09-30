@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import TravelWindows from "./TravelWindows";
+import { SPORTS } from "@/lib/sports";
 import PushOptIn from "./PushOptIn";
 import Link from "next/link";
 
@@ -12,6 +13,7 @@ export default function SettingsView({ profile, plan, logCount, windows = [] }: 
   const router = useRouter();
   const [startDate, setStartDate] = useState(plan?.start_date || "");
   const [restDow, setRestDow] = useState<number>(profile?.rest_dow ?? 0);
+  const [sport, setSport] = useState<string>(profile?.sport || "");
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState("");
   const [err, setErr] = useState("");
@@ -53,7 +55,7 @@ export default function SettingsView({ profile, plan, logCount, windows = [] }: 
     setBusy(false);
   };
 
-  const saveDates = () => post({ start_date: startDate, rest_dow: restDow }, "Saved. Your calendar has shifted to the new dates.");
+  const saveDates = () => post({ start_date: startDate, rest_dow: restDow, sport }, "Saved.");
   const doRestart = () => {
     post({ start_date: newStart, clear_logs: clearLogs },
       clearLogs ? "Programme restarted. Day 1 is your new start date and previous logs are cleared."
@@ -86,6 +88,14 @@ export default function SettingsView({ profile, plan, logCount, windows = [] }: 
           <select className="inp" value={restDow} onChange={(e) => setRestDow(Number(e.target.value))}>
             {DAYS.map((d, i) => <option key={d} value={i}>{d}</option>)}
           </select>
+        </div>
+        <div className="field">
+          <label className="label">Daily sport mobility</label>
+          <select className="inp" value={sport} onChange={(e) => setSport(e.target.value)}>
+            <option value="">None</option>
+            {SPORTS.map((sp) => <option key={sp.id} value={sp.id}>{sp.label} — {sp.minutes} min</option>)}
+          </select>
+          <span className="muted" style={{ fontSize: 11 }}>Runs every day alongside your training, rest days included.</span>
         </div>
         <button className="btn" onClick={saveDates} disabled={busy || !startDate}>{busy ? "Saving…" : "Save schedule"}</button>
       </div>

@@ -9,11 +9,16 @@ export async function POST(req: Request) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
-  const { start_date, clear_logs, rest_dow } = (await req.json()) as {
+  const { start_date, clear_logs, rest_dow, sport } = (await req.json()) as {
     start_date?: string;
     clear_logs?: boolean;
     rest_dow?: number;
+    sport?: string;
   };
+
+  if (typeof sport === "string") {
+    await supabase.from("profiles").update({ sport: sport || null, updated_at: new Date().toISOString() }).eq("id", user.id);
+  }
 
   if (typeof rest_dow === "number") {
     await supabase.from("profiles").update({ rest_dow, updated_at: new Date().toISOString() }).eq("id", user.id);
